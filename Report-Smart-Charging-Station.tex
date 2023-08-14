@@ -1,6 +1,17 @@
 \documentclass[12pt]{article}
 
 \usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\begin{tabularx}{0.8\textwidth} { 
+    | >{\raggedright\arraybackslash}X 
+    | >{\centering\arraybackslash}X 
+    | >{\raggedleft\arraybackslash}X | }
+   \hline
+   item 11 & item 12 & item 13 \\
+   \hline
+   item 21  & item 22  & item 23  \\
+  \hline
+  \end{tabularx}
 %\usepackage[T1]{fontenc}
 
 \usepackage{geometry}
@@ -108,6 +119,31 @@ Vincoli circa la lunghezza della sezione (escluse didascalie, tabelle, testo nel
 %----------------------------------------------------------------------------------------
 
 \section{Analisi dei requisiti}
+
+\subsection*{Requisiti utente}
+
+\begin{tabular}{l|rr}
+    Codice requisito & Testo del requisito \\
+    \hline
+    1 & Visualizzazione dello stato di una singola stazione di ricarica \\
+    1.1 & Stazione occupata o libera \\
+    1.2 & Lo stato di completamento della ricarica \\
+    1.3 & Stima della tempistica di completamento della ricarica \\
+    2 & Visualizzazione di una mappa con le stazioni all'interno del territorio limitrofo \\
+    2.1 & Visualizzazione dello stato (semplificato) di tutte le stazioni \\
+    2.2 & Possibilità di selezionare una stazione nella mappa \\
+    3 & Gestione delle stazioni di ricarica \\
+    3.1 & Prenotazione di una stazione di ricarica \\
+    3.2 & Aggiunta di stazione d'interesse \\
+    3.3 & Ricezione di una notifica nel caso in cui si liberi una stazione d'interesse \\
+    3.4 & Segnalazione di eventuali problemi inerenti ad una stazione di ricarica \\
+    3.5 & Sblocco di una colonnina con QR code e fotocamera \\
+    4 & Pagamento ricarica in app \\
+    \hline
+   \end{tabular}
+   
+
+
 
 In questa sezione esporre brevemente i requisiti a cui il sistema proposto deve rispondere, concentrando l'attenzione sugli aspetti più rilevanti e facendo eventualmente uso di opportuni diagrammi di alto livello.\\
 
