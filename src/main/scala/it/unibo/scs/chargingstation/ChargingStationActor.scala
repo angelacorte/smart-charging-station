@@ -7,7 +7,7 @@ import it.unibo.scs.car.CarActor
 import it.unibo.scs.userapp.UserAppActor
 
 import javax.swing.event.DocumentEvent.EventType
-
+import concurrent.duration.DurationInt
 
 object ChargingStationActor:
   sealed trait Event
