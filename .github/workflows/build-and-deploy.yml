@@ -64,7 +64,6 @@ jobs:
     needs:
       - check
       - test-release
-      - release
     if: >-
       always() && (
         contains(join(needs.*.result, ','), 'failure')
