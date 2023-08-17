@@ -11,10 +11,9 @@ import concurrent.duration.DurationInt
 
 object ChargingStationActor:
   sealed trait Event
-  case class AskState(csID: Int, replyTo: ActorRef[SendState]) extends Event //Any temporary, should be as above
-  case class SendState(chargingStation: ChargingStation)
-  case class ChangeState(csID: Int, newState: ChargingStationState) extends Event
-  case class Connect() extends Event //todo
+  case class UpdateChargingStation(chargingStation: ChargingStation)
+  case class SendState(csID: Int, replyTo: ActorRef[UpdateChargingStation]) extends Event //Any temporary, should be as above
+  case class ChangeState(csID: Int, newState: ChargingStationState, replyTo: ActorRef[UpdateChargingStation]) extends Event
   private case class Tick() extends Event
   private case class UserAppUpdated(newSet: Set[ActorRef[UserAppActor.Event]]) extends Event
   private case class CarUpdated(newSet: Set[ActorRef[CarActor.Event]]) extends Event
@@ -44,15 +43,37 @@ object ChargingStationActor:
                       userApp: Set[ActorRef[UserAppActor.Event]],
                       chargingStation: ChargingStation ) : Behavior[ChargingStationActor.Event] =
     Behaviors receiveMessage {
-      case AskState(chargingStationID, replyTo) =>
+      case SendState(chargingStationID, replyTo) =>
         if chargingStationID == chargingStation.id then
-          replyTo ! SendState(chargingStation)
+          replyTo ! UpdateChargingStation(chargingStation)
         Behaviors.same
-      case ChangeState(chargingStationID, newState) =>
+      case ChangeState(chargingStationID, newState, replyTo) =>
         if chargingStationID == chargingStation.id then
           val newCS = ChargingStation(id = chargingStation.id, state = newState, location = chargingStation.location)
-          running(ctx, cars, userApp, newCS)
+          replyTo ! UpdateChargingStation(newCS)
+          newState match
+            case ChargingStationState.FREE => running(ctx, cars, userApp, newCS) //should not happen
+            case ChargingStationState.CHARGING => charging(newCS)
+            case ChargingStationState.RESERVED => reserved(newCS)
+            case ChargingStationState.UNAVAILABLE => unavailable(newCS)
         else
           Behaviors.same
+      case _ => Behaviors.same
+    }
+
+  private def charging(chargingStation: ChargingStation): Behavior[ChargingStationActor.Event] =
+    Behaviors receiveMessage {
+
+      case _ => Behaviors.same
+    }
+
+  private def reserved(chargingStation: ChargingStation): Behavior[ChargingStationActor.Event] =
+    Behaviors receiveMessage {
+      case _ => Behaviors.same
+    }
+
+  private def unavailable(chargingStation: ChargingStation): Behavior[ChargingStationActor.Event] =
+    Behaviors receiveMessage {
+      case _ => Behaviors.same
     }
 
