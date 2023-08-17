@@ -8,7 +8,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "smart-charging-station",
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.2.14" % Test,
+      "org.scalactic" %% "scalactic" % "3.2.16",
+      "org.scalatest" %% "scalatest" % "3.2.16" % Test,
       "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % AkkaVersion % Test,
     ),
