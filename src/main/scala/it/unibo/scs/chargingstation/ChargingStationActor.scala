@@ -23,7 +23,7 @@ object ChargingStationActor:
   def apply(chargingStation: ChargingStation): Behavior[ChargingStationActor.Event] =
     Behaviors withTimers { timers =>
       Behaviors setup { ctx =>
-        val subscriptionAdapter = ctx.messageAdapter(Receptionist.Listing) {
+        val subscriptionAdapter = ctx.messageAdapter[Receptionist.Listing] {
           case UserAppActor.UserAppServiceKey.Listing(newSet) => UserAppUpdated(newSet)
           case CarActor.CarServiceKey.Listing(newSet) => CarUpdated(newSet)
         }
