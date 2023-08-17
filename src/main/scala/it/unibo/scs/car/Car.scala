@@ -1,5 +1,3 @@
 package it.unibo.scs.car
 
-class Car {
-
-}
+case class Car(charge: Double)
