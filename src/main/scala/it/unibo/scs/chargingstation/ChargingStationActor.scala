@@ -23,19 +23,11 @@ object ChargingStationActor:
         replyTo ! ChargingStationUpdated(chargingStation)
         Behaviors.same
       case Charge(replyTo) =>
-        if chargingStation.state ==  ChargingStationState.FREE then
           replyTo ! Ok()
           charging(chargingStation, replyTo)
-        else
-          replyTo ! NotOk(chargingStation.state)
-          free(chargingStation)
-      /*case Reserve(replyTo) =>
-        if chargingStation.state ==  ChargingStationState.FREE then
-          replyTo ! Response.Ok
-          reserved(chargingStation)
-        else
-          replyTo ! Response.NotOk(chargingStation.state)
-          free(chargingStation)*/
+      case Reserve(replyTo) =>
+          replyTo ! Ok()
+          reserved(chargingStation, replyTo)
       case _ => Behaviors.same
     }
 
@@ -43,20 +35,29 @@ object ChargingStationActor:
     Behaviors withTimers { timers =>
       timers.startTimerWithFixedDelay(Tick(), 2.seconds)
       Behaviors receiveMessage {
-        case StopCharge() => free(chargingStation)
+        case Charge(replyTo) =>
+          replyTo ! NotOk(ChargingStationState.CHARGING)
+          charging(chargingStation, replyTo)
+        case Reserve(replyTo) =>
+          replyTo ! NotOk(ChargingStationState.CHARGING)
+          charging(chargingStation, replyTo)
+        case StopCharge() =>
+          free(chargingStation)
         case Tick() =>
           replyTo ! SendChargeFromChargingStation(5.0)
           charging(chargingStation, replyTo)
-        case _ => Behaviors.same
+        case _ => charging(chargingStation, replyTo)
       }
     }
 
-  private def reserved(chargingStation: ChargingStation): Behavior[ChargingStationEvents.Response] =
+  private def reserved(chargingStation: ChargingStation, replyTo: ActorRef[Response]): Behavior[ChargingStationEvents.Request] =
     Behaviors receiveMessage {
-      case _ => Behaviors.same
-    }
-
-  private def unavailable(chargingStation: ChargingStation): Behavior[ChargingStationEvents.Response] =
-    Behaviors receiveMessage {
-      case _ => Behaviors.same
+      case Charge(replyTo) =>
+        /**
+         * Contattare un db o altro per capire chi ha prenotato la colonnina
+         * la risposta va di conseguenza
+         */
+        replyTo ! NotOk(ChargingStationState.RESERVED)
+        charging(chargingStation, replyTo)
+      case _ => reserved(chargingStation, replyTo)
     }
