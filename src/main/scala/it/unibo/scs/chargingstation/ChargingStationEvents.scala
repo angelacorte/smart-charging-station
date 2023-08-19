@@ -4,22 +4,24 @@ import akka.actor.typed.ActorRef
 import it.unibo.scs.car.CarActor
 
 object ChargingStationEvents:
-  sealed trait Event
+  sealed trait Request
 
-  sealed trait ChargingStationListener
+  case class AskState(replyTo: ActorRef[Response]) extends Request
 
-  case class ChargingStationUpdated(chargingStation: ChargingStation) extends ChargingStationListener
+  case class Charge(replyTo: ActorRef[Response]) extends Request
 
-  case class AskState(replyTo: ActorRef[ChargingStationUpdated]) extends Event
+  case class Reserve(replyTo: ActorRef[Response]) extends Request
 
-  case class Charge(replyTo: ActorRef[ChargingStationListener]) extends Event
+  case class Tick() extends Request
 
-  case class Reserve(replyTo: ActorRef[ChargingStationListener]) extends Event
+  case class SendChargeFromChargingStation(charge: Double) extends Response
 
-  case class StopCharge() extends Event
+  case class Ok() extends Response
 
-  case class Tick() extends ChargingStationListener
+  case class NotOk(state: ChargingStationState) extends Response
 
-  enum Response extends ChargingStationListener:
-    case Ok
-    case NotOk(state: ChargingStationState)
+  sealed trait Response
+
+  case class ChargingStationUpdated(chargingStation: ChargingStation) extends Response
+
+  case class StopCharge() extends Request
