@@ -15,6 +15,14 @@ class ChargingStationTest extends TestService:
       probe.expectMessage(ChargingStationEvents.ChargingStationUpdated(chargingStation))
     }
 
+    "accept charging request if free" in {
+      val chargingStation = ChargingStation(id = 0, state = ChargingStationState.FREE, location = Point2D())
+      val sender = testKit.spawn(ChargingStationActor(chargingStation))
+      val probe = testKit.createTestProbe[ChargingStationEvents.Response]()
+      sender ! ChargingStationEvents.Charge(probe.ref)
+      probe.expectMessage(ChargingStationEvents.Ok())
+    }
+
     "not accept charging request if not free" in {
       val chargingStation = ChargingStation(id = 0, state = ChargingStationState.CHARGING, location = Point2D())
       val sender = testKit.spawn(ChargingStationActor(chargingStation))
