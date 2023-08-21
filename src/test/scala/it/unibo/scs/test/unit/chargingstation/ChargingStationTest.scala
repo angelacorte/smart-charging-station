@@ -1,4 +1,4 @@
-package it.unibo.scs.test.chargingstation
+package it.unibo.scs.test.unit.chargingstation
 
 import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationEvents, ChargingStationState}
 import it.unibo.scs.test.TestService
