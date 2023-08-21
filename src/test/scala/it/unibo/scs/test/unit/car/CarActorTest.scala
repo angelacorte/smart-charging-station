@@ -1,21 +1,21 @@
 package it.unibo.scs.test.unit.car
 
-import it.unibo.scs.car.{Car, CarActor}
+import it.unibo.scs.car.{Car, ControlUnit}
 import it.unibo.scs.test.TestService
 
 class CarActorTest extends TestService:
   "A Car" should {
     val car = Car()
-    val sender = testKit.spawn(CarActor(car))
-    val probe = testKit.createTestProbe[CarActor.Response]()
+    val sender = testKit.spawn(ControlUnit(car))
+    val probe = testKit.createTestProbe[ControlUnit.Response]()
 
     "Communicate its state" in {
-      sender ! CarActor.AskState(probe.ref)
-      probe.expectMessage(CarActor.CarUpdated(car))
+      sender ! ControlUnit.AskState(probe.ref)
+      probe.expectMessage(ControlUnit.CarUpdated(car))
     }
 
     "Start" in {
-      sender ! CarActor.StartCar()
+      sender ! ControlUnit.StartCar()
       probe.expectNoMessage()
     }
   }

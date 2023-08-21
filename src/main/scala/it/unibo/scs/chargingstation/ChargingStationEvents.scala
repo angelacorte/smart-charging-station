@@ -1,7 +1,7 @@
 package it.unibo.scs.chargingstation
 
 import akka.actor.typed.ActorRef
-import it.unibo.scs.car.CarActor
+import it.unibo.scs.car.ControlUnit
 
 object ChargingStationEvents:
   sealed trait Request
