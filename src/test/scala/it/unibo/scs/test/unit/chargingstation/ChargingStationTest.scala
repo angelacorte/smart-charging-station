@@ -21,7 +21,7 @@ class ChargingStationTest extends TestService:
     "accept charging request if free" in {
       sender ! ChargingStationEvents.Charge(probe.ref)
       probe.expectMessage(ChargingStationEvents.Ok())
-      probe.expectMessage(SendChargeFromChargingStation(5.0))
+      probe.expectMessage(SendChargeFromChargingStation(5.0, sender.ref))
     }
 
     "not accept charging request if not free" in {

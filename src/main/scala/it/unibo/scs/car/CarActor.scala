@@ -10,7 +10,7 @@ import concurrent.duration.DurationInt
 
 object CarActor:
   sealed trait Request
-  private final case class SendCharge(amount: Double) extends Request
+  private final case class SendCharge(amount: Double, replyTo: ActorRef[ChargingStationEvents.Request]) extends Request
   private final case class Discharge(amount: Double) extends Request
   case class AskState(replyTo: ActorRef[CarActor.Response]) extends Request
   case class StartCar() extends Request
@@ -24,8 +24,8 @@ object CarActor:
   def apply(car: Car): Behavior[CarActor.Request] =
     Behaviors.setup { context =>
       context.messageAdapter {
-        case SendChargeFromChargingStation(amount) =>
-          SendCharge(amount)
+        case SendChargeFromChargingStation(amount, replyTo) =>
+          SendCharge(amount, replyTo)
         case _ =>
           BadRequest()
       }
@@ -61,11 +61,12 @@ object CarActor:
 
   private def charging(car: Car): Behavior[CarActor.Request] =
     Behaviors receiveMessage {
-      case SendCharge(amount) =>
+      case SendCharge(amount, replyTo) =>
         val total = car.charge + amount
-        if total <= 1 then
+        if total < 1 then
           charging(Car(total))
         else
+          replyTo ! ChargingStationEvents.StopCharge()
           running(Car(total))
       case ChargeEnded() =>
         running(car)

@@ -14,7 +14,7 @@ object ChargingStationEvents:
 
   case class Tick() extends Request
 
-  case class SendChargeFromChargingStation(charge: Double) extends Response
+  case class SendChargeFromChargingStation(charge: Double, replyTo: ActorRef[ChargingStationEvents.Request]) extends Response
 
   case class Ok() extends Response
 
