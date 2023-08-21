@@ -3,8 +3,8 @@ package it.unibo.scs.chargingstation
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
-import it.unibo.scs.car.{Car, CarActor}
-import it.unibo.scs.car.CarActor.{CarUpdated, SendCharge}
+import it.unibo.scs.car.{Car, ControlUnit}
+import it.unibo.scs.car.ControlUnit.{CarUpdated, SendCharge}
 import it.unibo.scs.userapp.UserAppActor
 
 import javax.swing.event.DocumentEvent.EventType

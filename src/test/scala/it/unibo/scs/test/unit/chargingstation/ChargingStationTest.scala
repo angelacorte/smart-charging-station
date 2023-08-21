@@ -2,7 +2,7 @@ package it.unibo.scs.test.unit.chargingstation
 
 import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationEvents, ChargingStationState}
 import it.unibo.scs.test.TestService
-import it.unibo.scs.car.{Car, CarActor}
+import it.unibo.scs.car.{Car, ControlUnit}
 import it.unibo.scs.chargingstation.ChargingStationEvents.SendChargeFromChargingStation
 
 

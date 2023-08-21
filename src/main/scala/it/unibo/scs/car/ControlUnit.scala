@@ -8,20 +8,21 @@ import it.unibo.scs.chargingstation.ChargingStationEvents.{Response, SendChargeF
 
 import concurrent.duration.DurationInt
 
-object CarActor:
+object ControlUnit:
   sealed trait Request
   private final case class SendCharge(amount: Double, replyTo: ActorRef[ChargingStationEvents.Request]) extends Request
   private final case class Discharge(amount: Double) extends Request
-  case class AskState(replyTo: ActorRef[CarActor.Response]) extends Request
+  case class AskState(replyTo: ActorRef[ControlUnit.Response]) extends Request
   case class StartCar() extends Request
   case class ChargeEnded() extends Request
+  case class BatteryUpdated(battery: Battery) extends Request
   private final case class BadRequest() extends Request
   
   sealed trait Response
   case class CarUpdated(car: Car) extends Response
   
 
-  def apply(car: Car): Behavior[CarActor.Request] =
+  def apply(car: Car): Behavior[ControlUnit.Request] =
     Behaviors.setup { context =>
       context.messageAdapter {
         case SendChargeFromChargingStation(amount, replyTo) =>
@@ -39,8 +40,8 @@ object CarActor:
           Behaviors.same
       }
     }
-  
-  private def running(car: Car): Behavior[CarActor.Request] =
+
+  private def running(car: Car): Behavior[ControlUnit.Request] =
     Behaviors withTimers { timers =>
       timers.startTimerWithFixedDelay("discharge", Discharge(0.1), 1.seconds)
 
@@ -59,7 +60,7 @@ object CarActor:
     }
 
 
-  private def charging(car: Car): Behavior[CarActor.Request] =
+  private def charging(car: Car): Behavior[ControlUnit.Request] =
     Behaviors receiveMessage {
       case SendCharge(amount, replyTo) =>
         val total = car.charge + amount
