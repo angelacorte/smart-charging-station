@@ -1,5 +1,3 @@
 package it.unibo.scs.userapp
 
-class UserApp {
-
-}
+case class UserApp(id: Int)
