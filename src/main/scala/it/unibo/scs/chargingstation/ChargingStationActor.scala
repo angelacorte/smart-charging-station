@@ -34,17 +34,17 @@ object ChargingStationActor:
   private def charging(chargingStation: ChargingStation, replyTo: ActorRef[Response]): Behavior[ChargingStationEvents.Request] =
     Behaviors withTimers { timers =>
       timers.startTimerWithFixedDelay(Tick(), 2.seconds)
-      Behaviors receiveMessage {
-        case Charge(replyTo) =>
+      Behaviors receive {
+        case (_, Charge(replyTo)) =>
           replyTo ! NotOk(ChargingStationState.CHARGING)
           charging(chargingStation, replyTo)
-        case Reserve(replyTo) =>
+        case (_, Reserve(replyTo)) =>
           replyTo ! NotOk(ChargingStationState.CHARGING)
           charging(chargingStation, replyTo)
-        case StopCharge() =>
+        case (_, StopCharge()) =>
           free(chargingStation)
-        case Tick() =>
-          replyTo ! SendChargeFromChargingStation(5.0)
+        case (ctx, Tick()) =>
+          replyTo ! SendChargeFromChargingStation(5.0, ctx.self)
           charging(chargingStation, replyTo)
         case _ => charging(chargingStation, replyTo)
       }
