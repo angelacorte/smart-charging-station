@@ -5,12 +5,17 @@ import it.unibo.scs.test.TestService
 
 class CarActorTest extends TestService:
   "A Car" should {
-    "be able to charge" in {
-      val car = Car(0)
-      val sender = testKit.spawn(CarActor(car))
-      val probe = testKit.createTestProbe[CarActor.CarUpdated]()
-      sender ! CarActor.StartCharge()
-      sender ! CarActor.SendCharge(0.1, probe.ref)
-      probe.expectMessage(CarActor.CarUpdated(car.copy(charge = 0.1)))
+    val car = Car()
+    val sender = testKit.spawn(CarActor(car))
+    val probe = testKit.createTestProbe[CarActor.Response]()
+
+    "Communicate its state" in {
+      sender ! CarActor.AskState(probe.ref)
+      probe.expectMessage(CarActor.CarUpdated(car))
+    }
+
+    "Start" in {
+      sender ! CarActor.StartCar()
+      probe.expectNoMessage()
     }
   }
