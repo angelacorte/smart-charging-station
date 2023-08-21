@@ -1,4 +1,4 @@
-package it.unibo.scs.test.car
+package it.unibo.scs.test.unit.car
 
 import it.unibo.scs.car.{Car, CarActor}
 import it.unibo.scs.test.TestService
