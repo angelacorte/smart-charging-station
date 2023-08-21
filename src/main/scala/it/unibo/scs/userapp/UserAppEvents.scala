@@ -10,14 +10,14 @@ object UserAppEvents:
 
   case class Tick() extends Request
 
-  case class CSUpdatedUserApp(chargingStation: ChargingStation) extends Request
+  case class AskChargingStationState(replyTo: ActorRef[UserAppEvents.Response]) extends Request
 
-  case class CarUpdatedUserApp(car: Car) extends Request
+  case class AskCarState(replyTo: ActorRef[UserAppEvents.Response]) extends Request
 
   final case class BadRequest() extends Request
 
   sealed trait Response
 
-  case class AskChargingStationState(replyTo: ActorRef[UserAppEvents.Response]) extends Response
+  case class CSUpdatedUserApp(chargingStation: ChargingStation) extends Response
 
-  case class AskCarState(replyTo: ActorRef[UserAppEvents.Response]) extends Response
+  case class CarUpdatedUserApp(car: Car) extends Response
