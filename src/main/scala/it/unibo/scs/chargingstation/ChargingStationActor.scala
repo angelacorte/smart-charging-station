@@ -20,7 +20,7 @@ object ChargingStationActor:
   private def free(chargingStation: ChargingStation) : Behavior[ChargingStationEvents.Request] =
     Behaviors receiveMessage {
       case AskState(replyTo) =>
-        replyTo ! ChargingStationUpdated(chargingStation)
+        replyTo ! ChargingStationUpdated(chargingStation, ChargingStationState.FREE)
         Behaviors.same
       case Charge(replyTo) =>
           replyTo ! Ok()
@@ -35,6 +35,9 @@ object ChargingStationActor:
     Behaviors withTimers { timers =>
       timers.startTimerWithFixedDelay(Tick(), 2.seconds)
       Behaviors receive {
+        case (_, AskState(replyTo)) =>
+          replyTo ! ChargingStationUpdated(chargingStation, ChargingStationState.CHARGING)
+          charging(chargingStation, replyTo)
         case (_, Charge(replyTo)) =>
           replyTo ! NotOk(ChargingStationState.CHARGING)
           charging(chargingStation, replyTo)
@@ -52,6 +55,9 @@ object ChargingStationActor:
 
   private def reserved(chargingStation: ChargingStation, replyTo: ActorRef[Response]): Behavior[ChargingStationEvents.Request] =
     Behaviors receiveMessage {
+      case AskState(replyTo) =>
+        replyTo ! ChargingStationUpdated(chargingStation, ChargingStationState.RESERVED)
+        reserved(chargingStation, replyTo)
       case Charge(replyTo) =>
         /**
          * Contattare un db o altro per capire chi ha prenotato la colonnina
