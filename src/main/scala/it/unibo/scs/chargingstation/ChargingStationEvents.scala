@@ -22,6 +22,6 @@ object ChargingStationEvents:
 
   sealed trait Response
 
-  case class ChargingStationUpdated(chargingStation: ChargingStation) extends Response
+  case class ChargingStationUpdated(chargingStation: ChargingStation, state: ChargingStationState) extends Response
 
   case class StopCharge() extends Request
