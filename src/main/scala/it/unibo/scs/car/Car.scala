@@ -1,7 +1,7 @@
 package it.unibo.scs.car
 
-case class Car(charge: Double)
+case class Car(battery: Battery)
 
-object Car:
-  val maxCharge = 1
-  def apply(): Car = Car(Car.maxCharge)
+case class Battery(currentCharge: Double = 1):
+  def charge(amount: Double): Battery = copy(currentCharge = currentCharge + amount)
+  def discharge: Battery = copy(currentCharge = currentCharge - 0.1)
