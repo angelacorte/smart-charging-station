@@ -11,13 +11,12 @@ import concurrent.duration.DurationInt
 object ControlUnit:
   sealed trait Request
   private final case class SendCharge(amount: Double, replyTo: ActorRef[ChargingStationEvents.Request]) extends Request
-  private final case class Discharge(amount: Double) extends Request
   case class AskState(replyTo: ActorRef[ControlUnit.Response]) extends Request
   case class StartCar() extends Request
   case class ChargeEnded() extends Request
   case class BatteryUpdated(battery: Battery) extends Request
   private final case class BadRequest() extends Request
-  
+
   sealed trait Response
   case class CarUpdated(car: Car) extends Response
   
@@ -30,11 +29,15 @@ object ControlUnit:
         case _ =>
           BadRequest()
       }
+      
+      val batteryActor = context.spawn(BatteryActor(car.battery, context.self), "batteryActor")
+      
       Behaviors.receiveMessage {
         case AskState(replyTo) =>
           replyTo ! CarUpdated(car)
           Behaviors.same
         case StartCar() =>
+          batteryActor ! BatteryActor.TurnOn()
           running(car)
         case _ =>
           Behaviors.same
@@ -42,34 +45,12 @@ object ControlUnit:
     }
 
   private def running(car: Car): Behavior[ControlUnit.Request] =
-    Behaviors withTimers { timers =>
-      timers.startTimerWithFixedDelay("discharge", Discharge(0.1), 1.seconds)
-
-      Behaviors receiveMessage {
-        case AskState(replyTo) =>
-          replyTo ! CarUpdated(car)
-          running(car)
-        case Discharge(amount) =>
-          val total = car.charge - amount
-          if total <= 0.5 then
-            charging(Car(total))
-          else
-            running(Car(total))
-        case _ => running(car)
-      }
-    }
-
-
-  private def charging(car: Car): Behavior[ControlUnit.Request] =
     Behaviors receiveMessage {
-      case SendCharge(amount, replyTo) =>
-        val total = car.charge + amount
-        if total < 1 then
-          charging(Car(total))
-        else
-          replyTo ! ChargingStationEvents.StopCharge()
-          running(Car(total))
-      case ChargeEnded() =>
+      case AskState(replyTo) =>
+        replyTo ! CarUpdated(car)
         running(car)
-      case _ => charging(car)
+      case BatteryUpdated(battery) =>
+        println(s"Battery updated: $battery")
+        running(car.copy(battery = battery))
+      case _ => running(car)
     }
