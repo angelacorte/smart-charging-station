@@ -4,6 +4,7 @@ import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, Char
 import it.unibo.scs.test.TestService
 import it.unibo.scs.car.{Car, ControlUnit}
 import it.unibo.scs.chargingstation.ChargingStationEvents.SendChargeFromChargingStation
+import it.unibo.scs.chargingstation.ChargingStationState.FREE
 
 
 class ChargingStationTest extends TestService:
@@ -15,7 +16,7 @@ class ChargingStationTest extends TestService:
 
     "be created" in {
       sender ! ChargingStationEvents.AskState(probe.ref)
-      probe.expectMessage(ChargingStationEvents.ChargingStationUpdated(chargingStation))
+      probe.expectMessage(ChargingStationEvents.ChargingStationUpdated(chargingStation, FREE))
     }
 
     "accept charging request if free" in {
