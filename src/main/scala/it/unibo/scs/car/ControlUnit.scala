@@ -14,7 +14,7 @@ object ControlUnit:
   case class AskState(replyTo: ActorRef[ControlUnit.Response]) extends Request
   case class StartCar() extends Request
   case class ChargeEnded() extends Request
-  case class BatteryUpdated(battery: Battery) extends Request
+  case class BatteryUpdated(battery: Battery, status: BatteryStatus) extends Request
   private final case class BadRequest() extends Request
 
   sealed trait Response
@@ -49,8 +49,11 @@ object ControlUnit:
       case AskState(replyTo) =>
         replyTo ! CarUpdated(car)
         running(car)
-      case BatteryUpdated(battery) =>
-        println(s"Battery updated: $battery")
+      case BatteryUpdated(battery, status) =>
+        printStatus(battery, status)
         running(car.copy(battery = battery))
       case _ => running(car)
     }
+    
+  private def printStatus(battery: Battery, status: BatteryStatus): Unit =
+    println(s"Battery updated:\n battery -> $battery\n status -> $status")
