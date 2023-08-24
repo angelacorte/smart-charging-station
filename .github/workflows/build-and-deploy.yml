@@ -12,9 +12,7 @@ jobs:
           - windows-latest
           - macos-latest
         java-version:
-          - 11
           - 17
-          - 18
         jdk-dist:
           - adopt-open
           - temurin
