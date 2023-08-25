@@ -7,3 +7,5 @@ Todo:
 - [x] Print the charging station and car's state to console
 
 ## Sprint 2
+- [] Implement a first version of the mobile app
+- [] Implement a REST service for charging stations
