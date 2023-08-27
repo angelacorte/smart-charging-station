@@ -16,7 +16,7 @@ class ChargingStationTest extends TestService:
 
     "be created" in {
       sender ! ChargingStationEvents.AskState(probe.ref)
-      probe.expectMessage(ChargingStationEvents.ChargingStationUpdated(chargingStation, FREE))
+      probe.expectMessage(ChargingStationEvents.ChargingStationUpdated(chargingStation, FREE, sender.ref))
     }
 
     "accept charging request if free" in {

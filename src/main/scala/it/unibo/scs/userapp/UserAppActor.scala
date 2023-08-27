@@ -26,7 +26,7 @@ object UserAppActor:
         }
 
         val chargingStationAdapter = context messageAdapter {
-          case ChargingStationEvents.ChargingStationUpdated(chargingStation, state) =>
+          case ChargingStationEvents.ChargingStationUpdated(chargingStation, state, _) =>
             UserAppEvents.ChargingStationUpdated(chargingStation, state)
           case _ => BadRequest()
         }
