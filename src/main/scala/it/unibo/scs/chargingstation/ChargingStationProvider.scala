@@ -23,6 +23,7 @@ object ChargingStationProvider:
           ChargingStationsUpdated(refs)
       }
       ctx.system.receptionist ! Receptionist.Subscribe(ChargingStationServiceKey, subscriptionAdapter)
+      ctx.system.receptionist ! Receptionist.Register(ProviderServiceKey, ctx.self)
 
       val csAdapter = ctx.messageAdapter[ChargingStationEvents.Response] {
         case ChargingStationEvents.ChargingStationUpdated(chargingStation, ref) =>
