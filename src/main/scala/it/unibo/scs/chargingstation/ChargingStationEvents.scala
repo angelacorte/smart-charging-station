@@ -16,5 +16,5 @@ object ChargingStationEvents:
   case class SendChargeFromChargingStation(charge: Double, replyTo: ActorRef[ChargingStationEvents.Request]) extends Response
   case class Ok() extends Response
   case class NotOk(state: ChargingStationState) extends Response
-  case class ChargingStationUpdated(chargingStation: ChargingStation, state: ChargingStationState, ref: ActorRef[ChargingStationEvents.Request]) extends Response
+  case class ChargingStationUpdated(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Response
 

@@ -6,10 +6,10 @@ import akka.actor.typed.scaladsl.Behaviors
 import it.unibo.scs.chargingstation.ChargingStationActor.ChargingStationServiceKey
 
 object ChargingStationProvider:
-  private type CSModel = (ChargingStation, ChargingStationState)
-  private type ChargingStationRegistry = Map[ActorRef[ChargingStationEvents.Request], CSModel]
+  private type ChargingStationRegistry = Map[ActorRef[ChargingStationEvents.Request], ChargingStation]
   sealed trait Request
-  case class UpdateChargingStation(chargingStation: ChargingStation, state: ChargingStationState, ref: ActorRef[ChargingStationEvents.Request]) extends Request
+  case class GetChargingStations(stations: Set[ChargingStation], replyTo: ActorRef[ChargingStation]) extends Request
+  case class UpdateChargingStation(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Request
   private case class ChargingStationsUpdated(chargingStations: Set[ActorRef[ChargingStationEvents.Request]]) extends Request
   private case class BadRequest() extends Request
 
@@ -25,8 +25,8 @@ object ChargingStationProvider:
       ctx.system.receptionist ! Receptionist.Subscribe(ChargingStationServiceKey, subscriptionAdapter)
 
       val csAdapter = ctx.messageAdapter[ChargingStationEvents.Response] {
-        case ChargingStationEvents.ChargingStationUpdated(chargingStation, state, ref) =>
-          UpdateChargingStation(chargingStation, state, ref)
+        case ChargingStationEvents.ChargingStationUpdated(chargingStation, ref) =>
+          UpdateChargingStation(chargingStation, ref)
         case _ =>
           BadRequest()
       }
@@ -35,8 +35,8 @@ object ChargingStationProvider:
         case ChargingStationsUpdated(refs) =>
           refs foreach { _ ! ChargingStationEvents.AskState(csAdapter) }
           Behaviors.same
-        case UpdateChargingStation(chargingStation, state, ref) =>
-          ChargingStationProvider(chargingStations.updated(ref, (chargingStation, state)))
+        case UpdateChargingStation(chargingStation, ref) =>
+          ChargingStationProvider(chargingStations.updated(ref, chargingStation))
         case _ =>
           Behaviors.same
       }

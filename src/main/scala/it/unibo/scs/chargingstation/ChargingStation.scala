@@ -8,4 +8,4 @@ enum ChargingStationState:
   case RESERVED
   case UNAVAILABLE //if the charging station has problems
 
-case class ChargingStation(id: Int)
+case class ChargingStation(id: Int, state: ChargingStationState = ChargingStationState.FREE)
