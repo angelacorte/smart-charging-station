@@ -26,14 +26,14 @@ object UserAppActor:
         }
 
         val chargingStationAdapter = context messageAdapter {
-          case ChargingStationEvents.ChargingStationUpdated(chargingStation, state, _) =>
-            UserAppEvents.ChargingStationUpdated(chargingStation, state)
+          case ChargingStationEvents.ChargingStationUpdated(chargingStation, _) =>
+            UserAppEvents.ChargingStationUpdated(chargingStation)
           case _ => BadRequest()
         }
 
         Behaviors receiveMessage {
-          case UserAppEvents.ChargingStationUpdated(chargingStation, state) =>
-            context.log.info(s"$chargingStation status ${state.toString}")
+          case UserAppEvents.ChargingStationUpdated(chargingStation) =>
+            context.log.info(s"$chargingStation status ${chargingStation.state.toString}")
             Behaviors.same
           case UserAppEvents.CarUpdated(car) =>
             context.log.info(s"Car status $car")

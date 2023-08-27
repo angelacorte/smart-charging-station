@@ -12,7 +12,7 @@ object UserAppEvents:
 
   final case class BadRequest() extends Request
 
-  case class ChargingStationUpdated(chargingStation: ChargingStation, state: ChargingStationState) extends Request
+  case class ChargingStationUpdated(chargingStation: ChargingStation) extends Request
 
   case class CarUpdated(car: Car) extends Request
 
