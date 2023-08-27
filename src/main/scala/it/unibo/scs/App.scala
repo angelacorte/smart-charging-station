@@ -9,6 +9,7 @@ object App:
     val config = ConfigFactory.parseString(s"""
              akka.remote.artery.canonical.port=$port
              """)
+      .withFallback(ConfigFactory.load("smart-charging-station"))
     ActorSystem[T](root, "ClusterSystem", config)
 
   def main(args: Array[String]): Unit =
