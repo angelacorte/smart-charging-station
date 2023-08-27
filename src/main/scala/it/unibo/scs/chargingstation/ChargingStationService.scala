@@ -5,16 +5,15 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.server.Directives.*
-
+import com.typesafe.config.Config
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import it.unibo.scs.chargingstation.ChargingStationProvider
 
 object ChargingStationService:
   sealed trait Request
   case class Stop() extends Request
-  def apply(port: Int, childProps: Props = Props.empty): Behavior[Request] =
+  def apply(port: Int, provider: ActorRef[ChargingStationProvider.Request]): Behavior[Request] =
     Behaviors.setup { context =>
-      /** SPAWN CHARGING STATION PROVIDER */
-      val chargingStationProvider = context.spawn(ChargingStationProvider(), "ChargingStationProvider", childProps)
 
       given system: ActorSystem[Nothing] = context.system
       given executionContext: ExecutionContextExecutor = system.executionContext
@@ -27,6 +26,7 @@ object ChargingStationService:
         }
 
       val bindingFuture = Http().newServerAt("localhost", port).bind(route)
+      context.log.info(s"Server online at http://localhost:$port/")
 
       Behaviors.receiveMessage {
         case Stop() =>
