@@ -8,7 +8,7 @@ import it.unibo.scs.chargingstation.ChargingStationActor.ChargingStationServiceK
 object ChargingStationProvider:
   private type ChargingStationRegistry = Map[ActorRef[ChargingStationEvents.Request], ChargingStation]
   sealed trait Request
-  case class GetChargingStations(stations: Set[ChargingStation], replyTo: ActorRef[ChargingStation]) extends Request
+  case class GetChargingStations(replyTo: ActorRef[Set[ChargingStation]]) extends Request
   case class UpdateChargingStation(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Request
   private case class ChargingStationsUpdated(chargingStations: Set[ActorRef[ChargingStationEvents.Request]]) extends Request
   private case class BadRequest() extends Request
