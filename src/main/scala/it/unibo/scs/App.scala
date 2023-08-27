@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationProvider, ChargingStationService}
 
 object App:
-  def startup[T](port: Int)(root: => Behavior[T]) =
+  def startup[T](port: Int)(root: => Behavior[T]): Unit =
     val config = ConfigFactory.parseString(s"""
              akka.remote.artery.canonical.port=$port
              """)
@@ -14,10 +14,9 @@ object App:
 
   def main(args: Array[String]): Unit =
     var port = 25251
+    startup(port)(ChargingStationProvider())
     (0 to 3) foreach { i =>
-      startup(port)(ChargingStationActor(ChargingStation(i)))
       port += 1
+      startup(port)(ChargingStationActor(ChargingStation(i)))
     }
-    val provider = startup(port)(ChargingStationProvider())
-    ActorSystem[ChargingStationService.Request](ChargingStationService(8080, provider), "ClusterSystem")
-    ()
+    //startup(port + 1)(ChargingStationService())

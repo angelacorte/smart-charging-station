@@ -32,13 +32,19 @@ object ChargingStationProvider:
           BadRequest()
       }
 
+      /** SPAWN CS SERVICE */
+      ctx.spawn(ChargingStationService(ctx.self), "ChargingStationService")
+
       Behaviors receiveMessage {
         case ChargingStationsUpdated(refs) =>
+          ctx.log.info("ChargingStationsUpdated: {}", refs)
           refs foreach { _ ! ChargingStationEvents.AskState(csAdapter) }
           Behaviors.same
         case UpdateChargingStation(chargingStation, ref) =>
+          ctx.log.info("UpdateChargingStation: {}", chargingStation)
           ChargingStationProvider(chargingStations.updated(ref, chargingStation))
         case GetChargingStations(replyTo) =>
+          ctx.log.info("GetChargingStations: {}", chargingStations.values.toSet)
           replyTo ! chargingStations.values.toSet
           Behaviors.same
         case _ =>

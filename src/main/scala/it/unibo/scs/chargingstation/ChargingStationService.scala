@@ -1,18 +1,28 @@
 package it.unibo.scs.chargingstation
 
+import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Props}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.AskPattern.*
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.server.Directives.*
+import akka.util.Timeout
 import com.typesafe.config.Config
+
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import concurrent.duration.DurationInt
 import it.unibo.scs.chargingstation.ChargingStationProvider
+import it.unibo.scs.chargingstation.ChargingStationProvider.GetChargingStations
 
 object ChargingStationService:
   sealed trait Request
   case class Stop() extends Request
-  def apply(port: Int, provider: ActorRef[ChargingStationProvider.Request]): Behavior[Request] =
+  private case class ProvidersUpdated(providers: Set[ActorRef[ChargingStationProvider.Request]]) extends Request
+
+  private val CSServiceKey: ServiceKey[Request] = ServiceKey("ChargingStationService")
+
+  def apply(provider: ActorRef[ChargingStationProvider.Request], port: Int = 8080): Behavior[Request] =
     Behaviors.setup { context =>
 
       given system: ActorSystem[Nothing] = context.system
@@ -21,6 +31,11 @@ object ChargingStationService:
       val route =
         path("hello") {
           get {
+            given timeout: Timeout = 5.seconds
+              for
+                s <- provider.ask(GetChargingStations(_))
+                _ = println(s)
+              yield s
             complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
           }
         }
