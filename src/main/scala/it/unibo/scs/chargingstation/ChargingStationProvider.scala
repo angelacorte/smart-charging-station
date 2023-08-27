@@ -37,6 +37,9 @@ object ChargingStationProvider:
           Behaviors.same
         case UpdateChargingStation(chargingStation, ref) =>
           ChargingStationProvider(chargingStations.updated(ref, chargingStation))
+        case GetChargingStations(replyTo) =>
+          replyTo ! chargingStations.values.toSet
+          Behaviors.same
         case _ =>
           Behaviors.same
       }
