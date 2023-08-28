@@ -4,6 +4,7 @@ import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.Behaviors
 import it.unibo.scs.CborSerializable
+import it.unibo.scs.chargingstation.ChargingStation.*
 import it.unibo.scs.chargingstation.ChargingStationActor.ChargingStationServiceKey
 
 object ChargingStationProvider:

@@ -1,7 +1,9 @@
 package it.unibo.scs.chargingstation
 
 import it.unibo.scs.CborSerializable
-import it.unibo.scs.chargingstation.ChargingStationState.ChargingStationState
+import spray.json.DefaultJsonProtocol.*
+import spray.json.{DeserializationException, JsArray, JsString, JsValue, RootJsonFormat}
+import spray.json.enrichAny
 
 object ChargingStation:
   object ChargingStationState extends Enumeration with Serializable:

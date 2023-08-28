@@ -6,7 +6,13 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.server.Directives.*
+
 import akka.util.Timeout
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import spray.json.DefaultJsonProtocol._
+import spray.json.RootJsonFormat
+
+import it.unibo.scs.chargingstation.ChargingStation.*
 import it.unibo.scs.chargingstation.ChargingStationProvider.GetChargingStations
 
 import scala.concurrent.ExecutionContextExecutor
@@ -22,6 +28,7 @@ object ChargingStationService:
 
       given system: ActorSystem[Nothing] = context.system
       given executionContext: ExecutionContextExecutor = system.executionContext
+      import Formats.given // for the implicit marshaller
 
       val route =
         path("chargingstations") {
