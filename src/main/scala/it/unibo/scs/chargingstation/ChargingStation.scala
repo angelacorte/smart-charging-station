@@ -1,19 +1,20 @@
 package it.unibo.scs.chargingstation
 
 import it.unibo.scs.CborSerializable
+import it.unibo.scs.chargingstation.ChargingStationState
+import it.unibo.scs.chargingstation.ChargingStationState.ChargingStationState
 import spray.json.DefaultJsonProtocol.*
 import spray.json.{DeserializationException, JsArray, JsString, JsValue, RootJsonFormat}
 import spray.json.enrichAny
 
+object ChargingStationState extends Enumeration with Serializable:
+  type ChargingStationState = Value
+  val FREE, CHARGING, RESERVED, UNAVAILABLE = Value
+
+case class Position(latitude: Double, longitude: Double) extends CborSerializable
+case class ChargingStation(id: Int, state: ChargingStationState = ChargingStationState.FREE) extends CborSerializable
+
 object ChargingStation:
-  object ChargingStationState extends Enumeration with Serializable:
-    type ChargingStationState = Value
-    val FREE, CHARGING, RESERVED, UNAVAILABLE = Value
-
-  import ChargingStationState._
-  
-  case class ChargingStation(id: Int, state: ChargingStationState = ChargingStationState.FREE) extends CborSerializable
-
   object Formats:
     given stateFormatter: RootJsonFormat[ChargingStationState] with
       override def write(obj: ChargingStationState.Value): JsValue = JsString(obj.toString)
