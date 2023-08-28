@@ -1,19 +1,16 @@
 package it.unibo.scs.chargingstation
 
-import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Props}
-import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.AskPattern.*
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
-import com.typesafe.config.Config
-
-import scala.concurrent.{ExecutionContextExecutor, Future}
-import concurrent.duration.DurationInt
-import it.unibo.scs.chargingstation.ChargingStationProvider
 import it.unibo.scs.chargingstation.ChargingStationProvider.GetChargingStations
+
+import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration.DurationInt
 
 object ChargingStationService:
   sealed trait Request
