@@ -26,29 +26,35 @@ object ChargingStationProvider:
       ctx.system.receptionist ! Receptionist.Subscribe(ChargingStationServiceKey, subscriptionAdapter)
       ctx.system.receptionist ! Receptionist.Register(ProviderServiceKey, ctx.self)
 
-      val csAdapter = ctx.messageAdapter[ChargingStationEvents.Response] {
-        case ChargingStationEvents.ChargingStationUpdated(chargingStation, ref) =>
-          UpdateChargingStation(chargingStation, ref)
-        case _ =>
-          BadRequest()
-      }
+
 
       /** SPAWN CS SERVICE */
       ctx.spawn(ChargingStationService(ctx.self), "ChargingStationService")
 
-      Behaviors receiveMessage {
-        case ChargingStationsUpdated(refs) =>
-          ctx.log.info("ChargingStationsUpdated: {}", refs)
-          refs foreach { _ ! ChargingStationEvents.AskState(csAdapter) }
-          Behaviors.same
-        case UpdateChargingStation(chargingStation, ref) =>
-          ctx.log.info("UpdateChargingStation: {}", chargingStation)
-          ChargingStationProvider(chargingStations.updated(ref, chargingStation))
-        case GetChargingStations(replyTo) =>
-          ctx.log.info("GetChargingStations: {}", chargingStations.values.toSet)
-          replyTo ! chargingStations.values.toSet
-          Behaviors.same
-        case _ =>
-          Behaviors.same
-      }
+      running(chargingStations)
+    }
+
+  private def running(chargingStations: ChargingStationRegistry = Map.empty): Behavior[Request] =
+    Behaviors receive {
+      case (ctx, ChargingStationsUpdated(refs)) =>
+        ctx.log.info("ChargingStationsUpdated: {}", refs)
+        val csAdapter = ctx.messageAdapter[ChargingStationEvents.Response] {
+          case ChargingStationEvents.ChargingStationUpdated(chargingStation, ref) =>
+            UpdateChargingStation(chargingStation, ref)
+          case _ =>
+            BadRequest()
+        }
+        refs foreach {
+          _ ! ChargingStationEvents.AskState(csAdapter)
+        }
+        running(chargingStations)
+      case (ctx, UpdateChargingStation(chargingStation, ref)) =>
+        ctx.log.info("UpdateChargingStation: {}", chargingStation)
+        running(chargingStations.updated(ref, chargingStation))
+      case (ctx, GetChargingStations(replyTo)) =>
+        ctx.log.info("GetChargingStations: {}", chargingStations.values.toSet)
+        replyTo ! chargingStations.values.toSet
+        running(chargingStations)
+      case _ =>
+        running(chargingStations)
     }
