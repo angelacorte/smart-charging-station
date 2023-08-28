@@ -7,8 +7,7 @@ import it.unibo.scs.car.{Car, ControlUnit}
 import it.unibo.scs.car.ControlUnit.{CarUpdated, SendCharge}
 import it.unibo.scs.chargingstation.ChargingStationProvider
 import it.unibo.scs.chargingstation.ChargingStationProvider.ProviderServiceKey
-import it.unibo.scs.chargingstation.ChargingStationState.{CHARGING, FREE, RESERVED}
-import it.unibo.scs.userapp.UserAppActor
+import it.unibo.scs.chargingstation.ChargingStation.*
 
 import javax.swing.event.DocumentEvent.EventType
 import concurrent.duration.DurationInt
@@ -36,7 +35,7 @@ object ChargingStationActor:
         free(chargingStation, providers)
       case (_, Charge(replyTo)) =>
           replyTo ! Ok()
-          charging(chargingStation.copy(state = CHARGING), replyTo, providers)
+          charging(chargingStation.copy(state = ChargingStationState.CHARGING), replyTo, providers)
       case (_, Reserve(replyTo)) =>
           replyTo ! Ok()
           reserved(chargingStation.copy(state = ChargingStationState.RESERVED), replyTo, providers)
@@ -57,7 +56,7 @@ object ChargingStationActor:
           replyTo ! NotOk(ChargingStationState.CHARGING)
           charging(chargingStation, replyTo, providers)
         case (_, StopCharge()) =>
-          free(chargingStation.copy(state = FREE), providers)
+          free(chargingStation.copy(state = ChargingStationState.FREE), providers)
         case (ctx, Tick()) =>
           replyTo ! SendChargeFromChargingStation(5.0, ctx.self)
           charging(chargingStation, replyTo, providers)
@@ -75,7 +74,7 @@ object ChargingStationActor:
          * Contattare un db o altro per capire chi ha prenotato la colonnina
          * la risposta va di conseguenza
          */
-        replyTo ! NotOk(RESERVED)
-        charging(chargingStation.copy(state = CHARGING), replyTo, providers)
+        replyTo ! NotOk(ChargingStationState.RESERVED)
+        charging(chargingStation.copy(state = ChargingStationState.CHARGING), replyTo, providers)
       case _ => reserved(chargingStation, replyTo, providers)
     }
