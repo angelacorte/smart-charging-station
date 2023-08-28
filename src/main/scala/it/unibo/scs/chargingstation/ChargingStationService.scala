@@ -24,14 +24,14 @@ object ChargingStationService:
       given executionContext: ExecutionContextExecutor = system.executionContext
 
       val route =
-        path("hello") {
+        path("chargingstations") {
           get {
             given timeout: Timeout = 5.seconds
-              for
-                s <- provider.ask(GetChargingStations(_))
-                _ = println(s)
-              yield s
-            complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+
+            val chargingStations = provider.ask(GetChargingStations)
+            onSuccess(chargingStations) { stations =>
+              complete(stations.toList)
+            }
           }
         }
 
