@@ -1,16 +1,12 @@
 package it.unibo.scs.chargingstation
 
-import akka.actor.typed.{ActorRef, Behavior}
-import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
-import it.unibo.scs.car.{Car, ControlUnit}
-import it.unibo.scs.car.ControlUnit.{CarUpdated, SendCharge}
-import it.unibo.scs.chargingstation.ChargingStationProvider
-import it.unibo.scs.chargingstation.ChargingStationProvider.ProviderServiceKey
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import it.unibo.scs.chargingstation.ChargingStation.*
+import it.unibo.scs.chargingstation.ChargingStationProvider.ProviderServiceKey
 
-import javax.swing.event.DocumentEvent.EventType
-import concurrent.duration.DurationInt
+import scala.concurrent.duration.DurationInt
 
 object ChargingStationActor:
   import ChargingStationEvents.*
