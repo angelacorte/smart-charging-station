@@ -16,9 +16,7 @@ object ChargingStationService:
   sealed trait Request
   case class Stop() extends Request
   private case class ProvidersUpdated(providers: Set[ActorRef[ChargingStationProvider.Request]]) extends Request
-
-  private val CSServiceKey: ServiceKey[Request] = ServiceKey("ChargingStationService")
-
+  
   def apply(provider: ActorRef[ChargingStationProvider.Request], port: Int = 8080): Behavior[Request] =
     Behaviors.setup { context =>
 
