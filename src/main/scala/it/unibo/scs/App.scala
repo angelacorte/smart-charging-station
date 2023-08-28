@@ -2,10 +2,10 @@ package it.unibo.scs
 
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.ConfigFactory
-import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationProvider, ChargingStationService}
+import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationProvider}
 
 object App:
-  def startup[T](port: Int)(root: => Behavior[T]): Unit =
+  private def startup[T](port: Int)(root: => Behavior[T]): Unit =
     val config = ConfigFactory.parseString(s"""
              akka.remote.artery.canonical.port=$port
              """)
@@ -19,4 +19,3 @@ object App:
       port += 1
       startup(port)(ChargingStationActor(ChargingStation(i)))
     }
-    //startup(port + 1)(ChargingStationService())
