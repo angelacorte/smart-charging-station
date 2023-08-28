@@ -1,11 +1,10 @@
 package it.unibo.scs.chargingstation
 
-import scala.util.Random
+import it.unibo.scs.CborSerializable
+import it.unibo.scs.chargingstation.ChargingStationState.ChargingStationState
 
-enum ChargingStationState:
-  case FREE
-  case CHARGING
-  case RESERVED
-  case UNAVAILABLE //if the charging station has problems
+object ChargingStationState extends Enumeration:
+  type ChargingStationState = Value
+  val FREE, CHARGING, RESERVED, UNAVAILABLE = Value
 
-case class ChargingStation(id: Int, state: ChargingStationState = ChargingStationState.FREE)
+case class ChargingStation(id: Int, state: ChargingStationState = ChargingStationState.FREE) extends CborSerializable
