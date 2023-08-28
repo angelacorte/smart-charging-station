@@ -1,24 +1,41 @@
 \documentclass[12pt]{article}
-
+\usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{makeidx}
+\usepackage{listings}
+\usepackage[square,numbers,sort]{natbib}
 \usepackage{tabularx}
-\begin{tabularx}{0.8\textwidth} { 
-    | >{\raggedright\arraybackslash}X 
-    | >{\centering\arraybackslash}X 
-    | >{\raggedleft\arraybackslash}X | }
-   \hline
-   item 11 & item 12 & item 13 \\
-   \hline
-   item 21  & item 22  & item 23  \\
-  \hline
-  \end{tabularx}
-%\usepackage[T1]{fontenc}
+\usepackage{float}
 
 \usepackage{geometry}
 \geometry{a4paper}
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage[italian]{babel}
+
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+% \begin{tabularx}{0.8\textwidth} { 
+%   | >{\raggedright\arraybackslash}X 
+%   | >{\centering\arraybackslash}X 
+%   | >{\raggedleft\arraybackslash}X | }
+%  \hline
+%  item 11 & item 12 & item 13 \\
+%  \hline
+%  item 21  & item 22  & item 23  \\
+% \hline
+% \end{tabularx}
+%\usepackage[T1]{fontenc}
+
+
+% version
+\newcommand{\versionmajor}{0}
+\newcommand{\versionminor}{1}
+\newcommand{\versionpatch}{2}
+\newcommand{\version}{\versionmajor.\versionminor.\versionpatch}
+\typeout{Document version: \version}
+
+
 
 \linespread{1.2}
 \setlength{\parindent}{0pt}
@@ -31,23 +48,23 @@
 
 \begin{titlepage}
 
-\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+  \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 
-\center
+  \center
 
-\textsc{\Large Relazione di progetto di "Smart City e Tecnologie Mobili"}\\[0.5cm]
+  \textsc{\Large Relazione di progetto di "Smart City e Tecnologie Mobili"}\\[0.5cm]
 
-\HRule \\[0.4cm]
-{ \huge \bfseries Titolo del progetto}\\[0.4cm]
-\HRule \\[1.5cm]
+  \HRule \\[0.4cm]
+  { \huge \bfseries Smart Charging Stations}\\[0.4cm]
+  \HRule \\[1.5cm]
 
-\vfill
+  \vfill
 
-\begin{flushleft}
-\emph{Numero del gruppo:}\\[1cm]
-\emph{Componenti del gruppo:}\\[3cm]
-\end{flushleft}
+  \begin{flushleft}
+    \emph{Numero del gruppo: 127}\\[1cm]
+    \emph{Componenti del gruppo:\\Cortecchia Angela\\Micelli Leonardo}\\[3cm]
 
+  \end{flushleft}
 
 
 \end{titlepage}
@@ -59,6 +76,7 @@
 \tableofcontents
 
 \newpage
+
 
 
 \input{sections/sec01.tex}
