@@ -3,7 +3,6 @@ package it.unibo.scs.chargingstation
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import it.unibo.scs.chargingstation.ChargingStation.*
 import it.unibo.scs.chargingstation.ChargingStationProvider.ProviderServiceKey
 
 import scala.concurrent.duration.DurationInt
