@@ -33,14 +33,14 @@ object ChargingStationActor:
     Behaviors receive {
       case (ctx, AskState(replyTo)) =>
         replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
-        Behaviors.same
+        free(chargingStation, providers)
       case (_, Charge(replyTo)) =>
           replyTo ! Ok()
           charging(chargingStation.copy(state = CHARGING), replyTo, providers)
       case (_, Reserve(replyTo)) =>
           replyTo ! Ok()
-          reserved(chargingStation.copy(state = RESERVED), replyTo, providers)
-      case _ => Behaviors.same
+          reserved(chargingStation.copy(state = ChargingStationState.RESERVED), replyTo, providers)
+      case _ => free(chargingStation, providers)
     }
 
   private def charging(chargingStation: ChargingStation, replyTo: ActorRef[Response], providers: Set[ActorRef[ChargingStationProvider.Request]]): Behavior[ChargingStationEvents.Request] =
