@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/angelacorte/smart-charging-station/compare/1.0.1...1.0.2) (2023-08-29)
+
+
+### Bug Fixes
+
+* add line at end of table ([37772ab](https://github.com/angelacorte/smart-charging-station/commit/37772abb3e80f4304059a0a091d41aed1502a920))
+
 ## [1.0.1](https://github.com/angelacorte/smart-charging-station/compare/1.0.0...1.0.1) (2023-08-29)
 
 
