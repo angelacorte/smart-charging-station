@@ -11,14 +11,17 @@ object ChargingStationEvents:
   sealed trait Request
   case class AskState(replyTo: ActorRef[Response]) extends Request with CborSerializable
   case class Charge(replyTo: ActorRef[Response]) extends Request
-  case class Reserve(replyTo: ActorRef[Response]) extends Request
+  case class Reserve(replyTo: ActorRef[ReservationResult]) extends Request with CborSerializable
   case class Tick() extends Request
   case class StopCharge() extends Request
   case class ProvidersUpdated(providers: Set[ActorRef[ChargingStationProvider.Request]]) extends Request
 
   sealed trait Response
-  case class SendChargeFromChargingStation(charge: Double, replyTo: ActorRef[ChargingStationEvents.Request]) extends Response
   case class Ok() extends Response
   case class NotOk(state: ChargingStationState) extends Response
   case class ChargingStationUpdated(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Response with CborSerializable
+  
+  sealed trait ReservationResult
+  case class ReservationOk() extends ReservationResult with CborSerializable
+  case class ReservationNotOk(reason: String = "") extends ReservationResult with CborSerializable
 
