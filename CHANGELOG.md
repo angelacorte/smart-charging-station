@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/angelacorte/smart-charging-station/compare/1.0.0...1.0.1) (2023-08-29)
+
+
+### Bug Fixes
+
+* solve merge conflict ([6e39e44](https://github.com/angelacorte/smart-charging-station/commit/6e39e44fb5c300a623e6c254a245c2a47408e89e))
+
 ## 1.0.0 (2023-08-29)
 
 
