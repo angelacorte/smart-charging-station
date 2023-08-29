@@ -3,14 +3,15 @@ package it.unibo.scs.service.chargingstation
 import akka.actor.typed.scaladsl.AskPattern.*
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import akka.http.javadsl.unmarshalling.Unmarshaller
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
-import ChargingStationProvider.{AskAllChargingStations, AskChargingStation}
+import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
+import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ReservationNotOk, ReservationOk}
 import it.unibo.scs.model.chargingstation.ChargingStation
 import it.unibo.scs.model.chargingstation.ChargingStation.*
+import it.unibo.scs.service.chargingstation.ChargingStationProvider.{AskAllChargingStations, AskChargingStation, AskToReserveChargingStation}
 import it.unibo.scs.service.cors.CORSHandler.corsHandler
 
 import scala.concurrent.ExecutionContextExecutor
@@ -53,6 +54,17 @@ object ChargingStationService:
               }
             }
           },
+          path( "chargingstations" / IntNumber /"reserve") { id =>
+            post {
+              val actual = id
+              val response = provider.ask(AskToReserveChargingStation(actual, _))
+              onSuccess(response) { res =>
+                res.asInstanceOf[ChargingStationEvents.ReservationResult] match
+                  case ReservationOk() => complete("Reservation successful")
+                  case ReservationNotOk(reason) => complete(s"Reservation not successful, reason: $reason")
+              }
+            }
+          }
         )
       )
 
