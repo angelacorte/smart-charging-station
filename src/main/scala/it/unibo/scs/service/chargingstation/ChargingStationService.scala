@@ -11,9 +11,11 @@ import akka.util.Timeout
 import ChargingStationProvider.{AskAllChargingStations, AskChargingStation}
 import it.unibo.scs.model.chargingstation.ChargingStation
 import it.unibo.scs.model.chargingstation.ChargingStation.*
+import it.unibo.scs.service.cors.CORSHandler.corsHandler
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
+
 
 object ChargingStationService:
   sealed trait Request
@@ -30,26 +32,28 @@ object ChargingStationService:
       import Formats.given // for the implicit marshaller
 
       /** SETUP ROUTE */
-      val route = concat(
-        path("chargingstations") {
-          get {
-            val chargingStations = provider.ask(AskAllChargingStations)
-            onSuccess(chargingStations) { stations =>
-              complete(stations.toList)
+      val route = corsHandler(
+        concat(
+          path("chargingstations") {
+            get {
+              val chargingStations = provider.ask(AskAllChargingStations)
+              onSuccess(chargingStations) { stations =>
+                complete(stations.toList)
+              }
             }
-          }
-        },
-        path("chargingstations" / IntNumber) { id =>
-          get {
-            val chargingStation = provider.ask(AskChargingStation(id, _))
-            onSuccess(chargingStation) { station =>
-              // necessary cast because the compiler is an idiot (or because of type erasure)
-              station.asInstanceOf[Option[ChargingStation]] match
-                case Some(station) => complete(station)
-                case None => complete("ChargingStation not found")
+          },
+          path("chargingstations" / IntNumber) { id =>
+            get {
+              val chargingStation = provider.ask(AskChargingStation(id, _))
+              onSuccess(chargingStation) { station =>
+                // necessary cast because the compiler is an idiot (or because of type erasure)
+                station.asInstanceOf[Option[ChargingStation]] match
+                  case Some(station) => complete(station)
+                  case None => complete("ChargingStation not found")
+              }
             }
-          }
-        },
+          },
+        )
       )
 
 
