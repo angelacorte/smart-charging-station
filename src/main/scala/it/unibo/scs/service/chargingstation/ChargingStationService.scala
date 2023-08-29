@@ -38,7 +38,20 @@ object ChargingStationService:
               complete(stations.toList)
             }
           }
-        }
+        },
+        path("chargingstations" / IntNumber) { id =>
+          get {
+            val chargingStation = provider.ask(AskChargingStation(id, _))
+            onSuccess(chargingStation) { station =>
+              // necessary cast because the compiler is an idiot (or because of type erasure)
+              station.asInstanceOf[Option[ChargingStation]] match
+                case Some(station) => complete(station)
+                case None => complete("ChargingStation not found")
+            }
+          }
+        },
+      )
+
 
       val bindingFuture = Http().newServerAt("localhost", port).bind(route)
       context.log.info(s"Server online at http://localhost:$port/")
