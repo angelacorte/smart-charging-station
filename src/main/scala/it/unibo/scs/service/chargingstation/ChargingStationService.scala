@@ -1,14 +1,16 @@
-package it.unibo.scs.chargingstation
+package it.unibo.scs.service.chargingstation
 
 import akka.actor.typed.scaladsl.AskPattern.*
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.http.javadsl.unmarshalling.Unmarshaller
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
-import it.unibo.scs.chargingstation.ChargingStation.*
-import it.unibo.scs.chargingstation.ChargingStationProvider.GetChargingStations
+import ChargingStationProvider.{AskAllChargingStations, AskChargingStation}
+import it.unibo.scs.model.chargingstation.ChargingStation
+import it.unibo.scs.model.chargingstation.ChargingStation.*
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
@@ -21,16 +23,17 @@ object ChargingStationService:
   def apply(provider: ActorRef[ChargingStationProvider.Request], port: Int = 8080): Behavior[Request] =
     Behaviors.setup { context =>
 
+      /** SETUP IMPLICITS */
       given system: ActorSystem[Nothing] = context.system
-      given executionContext: ExecutionContextExecutor = system.executionContext
+      given executionContext: ExecutionContextExecutor = system.executionContext // for Future.flatmap
+      given timeout: Timeout = 5.seconds // for the ask pattern
       import Formats.given // for the implicit marshaller
 
-      val route =
+      /** SETUP ROUTE */
+      val route = concat(
         path("chargingstations") {
           get {
-            given timeout: Timeout = 5.seconds
-
-            val chargingStations = provider.ask(GetChargingStations)
+            val chargingStations = provider.ask(AskAllChargingStations)
             onSuccess(chargingStations) { stations =>
               complete(stations.toList)
             }

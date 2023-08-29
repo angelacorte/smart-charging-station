@@ -1,16 +1,20 @@
-package it.unibo.scs.chargingstation
+package it.unibo.scs.service.chargingstation
 
-import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import it.unibo.scs.CborSerializable
-import it.unibo.scs.chargingstation.ChargingStation.*
-import it.unibo.scs.chargingstation.ChargingStationActor.ChargingStationServiceKey
+import it.unibo.scs.cluster.chargingstation.ChargingStationActor.ChargingStationServiceKey
+import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
+import it.unibo.scs.model.chargingstation.ChargingStation
+import it.unibo.scs.model.chargingstation.ChargingStation.*
+import it.unibo.scs.service.chargingstation.ChargingStationService
 
 object ChargingStationProvider:
   private type ChargingStationRegistry = Map[ActorRef[ChargingStationEvents.Request], ChargingStation]
   sealed trait Request
-  case class GetChargingStations(replyTo: ActorRef[Set[ChargingStation]]) extends Request with CborSerializable
+  case class AskAllChargingStations(replyTo: ActorRef[Set[ChargingStation]]) extends Request with CborSerializable
+  case class AskChargingStation(id: Int, replyTo: ActorRef[Option[ChargingStation]]) extends Request with CborSerializable
   case class UpdateChargingStation(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Request with CborSerializable
   private case class ChargingStationsUpdated(chargingStations: Set[ActorRef[ChargingStationEvents.Request]]) extends Request
   private case class BadRequest() extends Request
@@ -38,7 +42,6 @@ object ChargingStationProvider:
   private def running(chargingStations: ChargingStationRegistry = Map.empty): Behavior[Request] =
     Behaviors receive {
       case (ctx, ChargingStationsUpdated(refs)) =>
-        ctx.log.info("ChargingStationsUpdated: {}", refs)
         val csAdapter = ctx.messageAdapter[ChargingStationEvents.Response] {
           case ChargingStationEvents.ChargingStationUpdated(chargingStation, ref) =>
             UpdateChargingStation(chargingStation, ref)
@@ -49,12 +52,13 @@ object ChargingStationProvider:
           _ ! ChargingStationEvents.AskState(csAdapter)
         }
         running(chargingStations)
-      case (ctx, UpdateChargingStation(chargingStation, ref)) =>
-        ctx.log.info("UpdateChargingStation: {}", chargingStation)
+      case (_, UpdateChargingStation(chargingStation, ref)) =>
         running(chargingStations.updated(ref, chargingStation))
-      case (ctx, GetChargingStations(replyTo)) =>
-        ctx.log.info("GetChargingStations: {}", chargingStations.values.toSet)
+      case (_, AskAllChargingStations(replyTo)) =>
         replyTo ! chargingStations.values.toSet
+        running(chargingStations)
+      case (_, AskChargingStation(id, replyTo)) =>
+        replyTo ! chargingStations.values.find(_.id == id)
         running(chargingStations)
       case _ =>
         running(chargingStations)
