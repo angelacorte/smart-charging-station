@@ -1,7 +1,6 @@
 package it.unibo.scs.test.unit.chargingstation
 
-import it.unibo.scs.chargingstation.ChargingStationState
-import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationEvents}
+import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationEvents, ChargingStationState, Position}
 import it.unibo.scs.test.TestService
 import it.unibo.scs.chargingstation.ChargingStationEvents.SendChargeFromChargingStation
 import it.unibo.scs.chargingstation.ChargingStationState.*
@@ -10,7 +9,8 @@ import it.unibo.scs.chargingstation.ChargingStationState.*
 class ChargingStationTest extends TestService:
   "A charging station" should {
 
-    val chargingStation = ChargingStation(0)
+    val chargingStation = ChargingStation(0, "Enel", "X Charging Station", 100, Position(44.17457186518429, 12.23658150624628))
+
     val sender = testKit.spawn(ChargingStationActor(chargingStation))
     val probe = testKit.createTestProbe[ChargingStationEvents.Response]()
 
