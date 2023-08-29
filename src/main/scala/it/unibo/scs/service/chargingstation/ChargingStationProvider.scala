@@ -1,20 +1,25 @@
 package it.unibo.scs.service.chargingstation
 
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
+import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import it.unibo.scs.CborSerializable
 import it.unibo.scs.cluster.chargingstation.ChargingStationActor.ChargingStationServiceKey
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
+import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ReservationNotOk, Reserve}
 import it.unibo.scs.model.chargingstation.ChargingStation
 import it.unibo.scs.model.chargingstation.ChargingStation.*
-import it.unibo.scs.service.chargingstation.ChargingStationService
+
+import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration.DurationInt
 
 object ChargingStationProvider:
   private type ChargingStationRegistry = Map[ActorRef[ChargingStationEvents.Request], ChargingStation]
   sealed trait Request
   case class AskAllChargingStations(replyTo: ActorRef[Set[ChargingStation]]) extends Request with CborSerializable
   case class AskChargingStation(id: Int, replyTo: ActorRef[Option[ChargingStation]]) extends Request with CborSerializable
+  case class AskToReserveChargingStation(id: Int, replyTo: ActorRef[ChargingStationEvents.ReservationResult]) extends Request with CborSerializable
   case class UpdateChargingStation(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Request with CborSerializable
   private case class ChargingStationsUpdated(chargingStations: Set[ActorRef[ChargingStationEvents.Request]]) extends Request
   private case class BadRequest() extends Request
@@ -59,6 +64,23 @@ object ChargingStationProvider:
         running(chargingStations)
       case (_, AskChargingStation(id, replyTo)) =>
         replyTo ! chargingStations.values.find(_.id == id)
+        running(chargingStations)
+      case (ctx, AskToReserveChargingStation(id, replyTo)) =>
+        chargingStations.find(_._2.id == id) match {
+          case Some((ref, _)) =>
+            given timeout: akka.util.Timeout = 5.seconds
+            given executionContext: ExecutionContextExecutor = ctx.system.executionContext
+            given scheduler: akka.actor.typed.Scheduler = ctx.system.scheduler
+            val reservation = ref.ask(Reserve(_))
+            reservation.onComplete {
+              case scala.util.Success(value) =>
+                replyTo ! value.asInstanceOf[ChargingStationEvents.ReservationResult]
+              case scala.util.Failure(exception) =>
+                replyTo ! ReservationNotOk(exception.getMessage)
+            }
+          case None =>
+            replyTo ! ReservationNotOk("Charging station not found")
+        }
         running(chargingStations)
       case _ =>
         running(chargingStations)
