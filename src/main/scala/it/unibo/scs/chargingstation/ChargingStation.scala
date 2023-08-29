@@ -12,7 +12,7 @@ object ChargingStationState extends Enumeration with Serializable:
   val FREE, CHARGING, RESERVED, UNAVAILABLE = Value
 
 case class Position(latitude: Double, longitude: Double) extends CborSerializable
-case class ChargingStation(id: Int, state: ChargingStationState = ChargingStationState.FREE) extends CborSerializable
+case class ChargingStation(id: Int, provider: String, name: String, voltage: Double, position: Position = Position(0,0), state: ChargingStationState = ChargingStationState.FREE) extends CborSerializable
 
 object ChargingStation:
   object Formats:
@@ -22,7 +22,9 @@ object ChargingStation:
         case JsString(value) => ChargingStationState.withName(value)
         case _ => throw DeserializationException("Enum string expected")
         
-    given stationFormat: RootJsonFormat[ChargingStation] = jsonFormat2(ChargingStation.apply)
+    given positionFormat: RootJsonFormat[Position] = jsonFormat2(Position.apply)
+    
+    given stationFormat: RootJsonFormat[ChargingStation] = jsonFormat6(ChargingStation.apply)
 
     given listFormat: RootJsonFormat[List[ChargingStation]] with
       override def write(obj: List[ChargingStation]): JsValue = JsArray(obj.map(_.toJson).toVector)
