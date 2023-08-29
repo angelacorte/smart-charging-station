@@ -2,8 +2,11 @@ package it.unibo.scs
 
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.ConfigFactory
-import it.unibo.scs.chargingstation.ChargingStation.*
-import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationProvider, Position}
+import it.unibo.scs.model.chargingstation.ChargingStation.*
+import it.unibo.scs.cluster.chargingstation.ChargingStationActor
+import it.unibo.scs.model.chargingstation
+import it.unibo.scs.model.chargingstation.{ChargingStation, Position}
+import it.unibo.scs.service.chargingstation.ChargingStationProvider
 
 object App:
   private def startup[T](port: Int)(root: => Behavior[T]): Unit =
