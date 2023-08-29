@@ -1,9 +1,11 @@
-package it.unibo.scs.chargingstation
+package it.unibo.scs.cluster.chargingstation
 
 import akka.actor.typed.ActorRef
 import it.unibo.scs.CborSerializable
-import it.unibo.scs.chargingstation.ChargingStation.*
-import it.unibo.scs.chargingstation.ChargingStationState.ChargingStationState
+import it.unibo.scs.model.chargingstation.ChargingStation
+import it.unibo.scs.model.chargingstation.ChargingStation.*
+import it.unibo.scs.model.chargingstation.ChargingStationState.ChargingStationState
+import it.unibo.scs.service.chargingstation.ChargingStationProvider
 
 object ChargingStationEvents:
   sealed trait Request

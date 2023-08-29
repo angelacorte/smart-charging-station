@@ -1,9 +1,10 @@
 package it.unibo.scs.test.unit.chargingstation
 
-import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationEvents, ChargingStationState, Position}
+import it.unibo.scs.cluster.chargingstation.{ChargingStationActor, ChargingStationEvents}
 import it.unibo.scs.test.TestService
-import it.unibo.scs.chargingstation.ChargingStationEvents.SendChargeFromChargingStation
-import it.unibo.scs.chargingstation.ChargingStationState.*
+import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.SendChargeFromChargingStation
+import it.unibo.scs.model.chargingstation.{ChargingStation, ChargingStationState, Position}
+import it.unibo.scs.model.chargingstation.ChargingStationState.*
 
 
 class ChargingStationTest extends TestService:
