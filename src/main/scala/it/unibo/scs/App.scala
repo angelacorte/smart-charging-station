@@ -3,7 +3,7 @@ package it.unibo.scs
 import akka.actor.typed.{ActorSystem, Behavior}
 import com.typesafe.config.ConfigFactory
 import it.unibo.scs.chargingstation.ChargingStation.*
-import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationProvider}
+import it.unibo.scs.chargingstation.{ChargingStation, ChargingStationActor, ChargingStationProvider, Position}
 
 object App:
   private def startup[T](port: Int)(root: => Behavior[T]): Unit =
@@ -15,8 +15,20 @@ object App:
 
   def main(args: Array[String]): Unit =
     var port = 25251
+    val chargingStations: List[ChargingStation] = List(
+      ChargingStation(0, "Enel", "X Charging Station", 100, Position(44.17457186518429, 12.23658150624628)),
+      ChargingStation(1, "Enel", "X WAY Charging Station", 100, Position(44.14523265977938, 12.260617176277155)),
+      ChargingStation(2, "Enel", "X WAY Charging Station", 100, Position(44.14506131431948, 12.25948270076121)),
+      ChargingStation(3, "Enel", "X Charging Station", 100, Position(44.145612588232495, 12.238379768214596)),
+      ChargingStation(4, "Neogy", "Charging Station", 100, Position(44.145554034484775, 12.226701099558664)),
+      ChargingStation(5, "Enel", "X Charging Station", 100, Position(44.139899361053246, 12.240021789211541)),
+      ChargingStation(6, "Eway", "Charging Station", 100, Position(44.14672422842581, 12.218455633179834)),
+      ChargingStation(7, "E.CO", "Charging Station", 100, Position(44.136807640165884, 12.22721036271666)),
+      ChargingStation(8, "Enel", "X Charging Station", 100, Position(44.13775592395241, 12.241067840087673)),
+      ChargingStation(9, "Be charge", "X Charging Station", 100, Position(44.13716960989673, 12.269283127921085)),
+    )
     startup(port)(ChargingStationProvider())
-    (0 to 3) foreach { i =>
+    chargingStations foreach { cs =>
       port += 1
-      startup(port)(ChargingStationActor(ChargingStation(i)))
+      startup(port)(ChargingStationActor(cs))
     }
