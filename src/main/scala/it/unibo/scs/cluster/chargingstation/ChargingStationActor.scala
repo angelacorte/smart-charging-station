@@ -4,7 +4,7 @@ import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import it.unibo.scs.service.chargingstation.ChargingStationProvider.ProviderServiceKey
-import it.unibo.scs.model.chargingstation.{ChargingStation, ChargingStationState}
+import it.unibo.scs.model.chargingstation.{ChargingStation, ChargingStationState, Reservation}
 import it.unibo.scs.service.chargingstation.ChargingStationProvider
 
 import scala.concurrent.duration.DurationInt
