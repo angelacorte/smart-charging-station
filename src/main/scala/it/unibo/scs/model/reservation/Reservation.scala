@@ -1,7 +1,8 @@
-package it.unibo.scs.model.chargingstation
+package it.unibo.scs.model.reservation
 
 import it.unibo.scs.CborSerializable
-import spray.json.DefaultJsonProtocol._
+import it.unibo.scs.model.reservation.Reservation
+import spray.json.DefaultJsonProtocol.*
 import spray.json.RootJsonFormat
 
 case class Reservation(userId: Int, chargingStationId: Int) extends CborSerializable

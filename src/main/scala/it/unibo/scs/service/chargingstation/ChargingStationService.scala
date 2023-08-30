@@ -9,8 +9,9 @@ import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ReservationNotOk, ReservationOk}
-import it.unibo.scs.model.chargingstation.{ChargingStation, Reservation}
+import it.unibo.scs.model.chargingstation.ChargingStation
 import it.unibo.scs.model.chargingstation.ChargingStation.*
+import it.unibo.scs.model.reservation.Reservation
 import it.unibo.scs.service.chargingstation.ChargingStationProvider.{AskAllChargingStations, AskChargingStation, AskToReserveChargingStation}
 import it.unibo.scs.service.cors.CORSHandler.corsHandler
 
