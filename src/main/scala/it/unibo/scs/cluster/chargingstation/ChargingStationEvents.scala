@@ -5,7 +5,6 @@ import it.unibo.scs.CborSerializable
 import it.unibo.scs.model.chargerequest.ChargeRequest
 import it.unibo.scs.model.chargingstation.ChargingStation
 import it.unibo.scs.model.chargingstation.ChargingStation.*
-import it.unibo.scs.model.chargingstation.ChargingStationState.ChargingStationState
 import it.unibo.scs.model.reservation.Reservation
 import it.unibo.scs.service.chargingstation.ChargingStationProvider
 
@@ -18,8 +17,6 @@ object ChargingStationEvents:
   case class ProvidersUpdated(providers: Set[ActorRef[ChargingStationProvider.Request]]) extends Request
 
   sealed trait Response
-  case class Ok() extends Response
-  case class NotOk(state: ChargingStationState) extends Response
   case class ChargingStationUpdated(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Response with CborSerializable
   
   sealed trait ReservationResult
