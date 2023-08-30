@@ -8,8 +8,9 @@ import it.unibo.scs.CborSerializable
 import it.unibo.scs.cluster.chargingstation.ChargingStationActor.ChargingStationServiceKey
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ReservationNotOk, Reserve}
-import it.unibo.scs.model.chargingstation.{ChargingStation, Reservation}
+import it.unibo.scs.model.chargingstation.ChargingStation
 import it.unibo.scs.model.chargingstation.ChargingStation.*
+import it.unibo.scs.model.reservation.Reservation
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
