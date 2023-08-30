@@ -12,7 +12,6 @@ object ChargingStationEvents:
   case class AskState(replyTo: ActorRef[Response]) extends Request with CborSerializable
   case class Charge(replyTo: ActorRef[Response]) extends Request
   case class Reserve(reservation: Reservation, replyTo: ActorRef[ReservationResult]) extends Request with CborSerializable
-  case class Tick() extends Request
   case class StopCharge() extends Request
   case class ProvidersUpdated(providers: Set[ActorRef[ChargingStationProvider.Request]]) extends Request
 
