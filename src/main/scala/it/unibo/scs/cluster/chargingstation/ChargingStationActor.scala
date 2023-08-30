@@ -33,9 +33,9 @@ object ChargingStationActor:
       case (_, Charge(replyTo)) =>
           replyTo ! Ok()
           charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
-      case (_, Reserve(_, replyTo)) =>
+      case (_, Reserve(reservation, replyTo)) =>
           replyTo ! ReservationOk()
-          reserved(chargingStation.copy(state = ChargingStationState.RESERVED), providers)
+          reserved(chargingStation.copy(state = ChargingStationState.RESERVED), reservation, providers)
       case _ => free(chargingStation, providers)
     }
 
@@ -60,16 +60,16 @@ object ChargingStationActor:
       }
     }
 
-  private def reserved(chargingStation: ChargingStation, providers: Set[ActorRef[ChargingStationProvider.Request]]): Behavior[ChargingStationEvents.Request] =
+  private def reserved(chargingStation: ChargingStation, reservation: Reservation, providers: Set[ActorRef[ChargingStationProvider.Request]]): Behavior[ChargingStationEvents.Request] =
     Behaviors receive {
       case (ctx, AskState(replyTo)) =>
         replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
-        reserved(chargingStation, providers)
+        reserved(chargingStation, reservation, providers)
       case (_, Charge(replyTo)) =>
         // TODO implement
         charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
       case (_, Reserve(_, replyTo)) =>
         replyTo ! ReservationNotOk("This charging station is already reserved")
-        reserved(chargingStation, providers)
-      case _ => reserved(chargingStation, providers)
+        reserved(chargingStation, reservation, providers)
+      case _ => reserved(chargingStation, reservation, providers)
     }
