@@ -31,8 +31,8 @@ object ChargingStationActor:
       case (ctx, AskState(replyTo)) =>
         replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
         free(chargingStation, providers)
-      case (_, Charge(replyTo)) =>
-          replyTo ! Ok()
+      case (_, Charge(_, replyTo)) =>
+          replyTo ! ChargeRequestOk()
           charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
       case (_, Reserve(reservation, replyTo)) =>
           replyTo ! ReservationOk()
@@ -42,13 +42,13 @@ object ChargingStationActor:
 
   private def charging(chargingStation: ChargingStation, providers: Set[ActorRef[ChargingStationProvider.Request]]): Behavior[ChargingStationEvents.Request] =
     Behaviors withTimers { timers =>
-      timers.startTimerWithFixedDelay(StopCharge(), 2.seconds)
+      timers.startTimerWithFixedDelay(StopCharge(), 3.seconds)
       Behaviors receive {
         case (ctx, AskState(replyTo)) =>
           replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
           charging(chargingStation, providers)
-        case (_, Charge(replyTo)) =>
-          replyTo ! NotOk(ChargingStationState.CHARGING)
+        case (_, Charge(_, replyTo)) =>
+          replyTo ! ChargeRequestNotOk("This charging station is busy")
           charging(chargingStation, providers)
         case (_, Reserve(_, replyTo)) =>
           replyTo ! ReservationNotOk("This charging station is busy")
@@ -64,9 +64,13 @@ object ChargingStationActor:
       case (ctx, AskState(replyTo)) =>
         replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
         reserved(chargingStation, reservation, providers)
-      case (_, Charge(replyTo)) =>
-        // TODO implement
-        charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
+      case (_, Charge(request, replyTo)) =>
+        if request.userId equals reservation.userId then
+          replyTo ! ChargeRequestOk()
+          charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
+        else
+          replyTo ! ChargeRequestNotOk("This charging station is reserved")
+          reserved(chargingStation, reservation, providers)
       case (_, Reserve(_, replyTo)) =>
         replyTo ! ReservationNotOk("This charging station is already reserved")
         reserved(chargingStation, reservation, providers)

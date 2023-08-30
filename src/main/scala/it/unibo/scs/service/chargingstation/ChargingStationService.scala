@@ -8,11 +8,12 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
-import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ReservationNotOk, ReservationOk}
+import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ChargeRequestNotOk, ChargeRequestOk, ReservationNotOk, ReservationOk}
 import it.unibo.scs.model.chargingstation.ChargingStation
 import it.unibo.scs.model.chargingstation.ChargingStation.*
 import it.unibo.scs.model.reservation.Reservation
-import it.unibo.scs.service.chargingstation.ChargingStationProvider.{AskAllChargingStations, AskChargingStation, AskToReserveChargingStation}
+import it.unibo.scs.model.chargerequest.ChargeRequest
+import it.unibo.scs.service.chargingstation.ChargingStationProvider.{AskAllChargingStations, AskChargingStation, AskChargingStationToCharge, AskToReserveChargingStation}
 import it.unibo.scs.service.cors.CORSHandler.corsHandler
 
 import scala.concurrent.ExecutionContextExecutor
@@ -33,6 +34,7 @@ object ChargingStationService:
       given timeout: Timeout = 5.seconds // for the ask pattern
       import ChargingStation.Formats.given // for the implicit marshaller
       import Reservation.Formats.given // for the implicit marshaller
+      import ChargeRequest.Formats.given // for the implicit marshaller
 
       /** SETUP ROUTE */
       val route = corsHandler(
@@ -67,7 +69,19 @@ object ChargingStationService:
                 }
               }
             }
-          }
+          },
+          path("charge") {
+            post {
+              entity(as[ChargeRequest]) { chargeRequest =>
+                val response = provider.ask(AskChargingStationToCharge(chargeRequest, _))
+                onSuccess(response) { res =>
+                  res.asInstanceOf[ChargingStationEvents.ChargeRequestResult] match
+                    case ChargeRequestOk() => complete("Charge successful")
+                    case ChargeRequestNotOk(reason) => complete(s"Charge not successful, reason: $reason")
+                }
+              }
+            }
+          },
         )
       )
 
