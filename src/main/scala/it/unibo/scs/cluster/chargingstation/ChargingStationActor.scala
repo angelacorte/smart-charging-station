@@ -41,7 +41,7 @@ object ChargingStationActor:
 
   private def charging(chargingStation: ChargingStation, providers: Set[ActorRef[ChargingStationProvider.Request]]): Behavior[ChargingStationEvents.Request] =
     Behaviors withTimers { timers =>
-      timers.startTimerWithFixedDelay(Tick(), 2.seconds)
+      timers.startTimerWithFixedDelay(StopCharge(), 2.seconds)
       Behaviors receive {
         case (ctx, AskState(replyTo)) =>
           replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
@@ -54,8 +54,6 @@ object ChargingStationActor:
           charging(chargingStation, providers)
         case (_, StopCharge()) =>
           free(chargingStation.copy(state = ChargingStationState.FREE), providers)
-        case (_, Tick()) =>
-          charging(chargingStation, providers)
         case _ => charging(chargingStation, providers)
       }
     }
