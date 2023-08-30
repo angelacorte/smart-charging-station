@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ReservationNotOk, ReservationOk}
-import it.unibo.scs.model.chargingstation.ChargingStation
+import it.unibo.scs.model.chargingstation.{ChargingStation, Reservation}
 import it.unibo.scs.model.chargingstation.ChargingStation.*
 import it.unibo.scs.service.chargingstation.ChargingStationProvider.{AskAllChargingStations, AskChargingStation, AskToReserveChargingStation}
 import it.unibo.scs.service.cors.CORSHandler.corsHandler
@@ -30,7 +30,8 @@ object ChargingStationService:
       given system: ActorSystem[Nothing] = context.system
       given executionContext: ExecutionContextExecutor = system.executionContext // for Future.flatmap
       given timeout: Timeout = 5.seconds // for the ask pattern
-      import Formats.given // for the implicit marshaller
+      import ChargingStation.Formats.given // for the implicit marshaller
+      import Reservation.Formats.given // for the implicit marshaller
 
       /** SETUP ROUTE */
       val route = corsHandler(
@@ -54,14 +55,15 @@ object ChargingStationService:
               }
             }
           },
-          path( "chargingstations" / IntNumber /"reserve") { id =>
+          path( "reserve-station") {
             post {
-              val actual = id
-              val response = provider.ask(AskToReserveChargingStation(actual, _))
-              onSuccess(response) { res =>
-                res.asInstanceOf[ChargingStationEvents.ReservationResult] match
-                  case ReservationOk() => complete("Reservation successful")
-                  case ReservationNotOk(reason) => complete(s"Reservation not successful, reason: $reason")
+              entity(as[Reservation]) { reservation =>
+                val response = provider.ask(AskToReserveChargingStation(reservation, _))
+                onSuccess(response) { res =>
+                  res.asInstanceOf[ChargingStationEvents.ReservationResult] match
+                    case ReservationOk() => complete("Reservation successful")
+                    case ReservationNotOk(reason) => complete(s"Reservation not successful, reason: $reason")
+                }
               }
             }
           }

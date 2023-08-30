@@ -8,7 +8,7 @@ import it.unibo.scs.CborSerializable
 import it.unibo.scs.cluster.chargingstation.ChargingStationActor.ChargingStationServiceKey
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ReservationNotOk, Reserve}
-import it.unibo.scs.model.chargingstation.ChargingStation
+import it.unibo.scs.model.chargingstation.{ChargingStation, Reservation}
 import it.unibo.scs.model.chargingstation.ChargingStation.*
 
 import scala.concurrent.ExecutionContextExecutor
@@ -19,7 +19,7 @@ object ChargingStationProvider:
   sealed trait Request
   case class AskAllChargingStations(replyTo: ActorRef[Set[ChargingStation]]) extends Request with CborSerializable
   case class AskChargingStation(id: Int, replyTo: ActorRef[Option[ChargingStation]]) extends Request with CborSerializable
-  case class AskToReserveChargingStation(id: Int, replyTo: ActorRef[ChargingStationEvents.ReservationResult]) extends Request with CborSerializable
+  case class AskToReserveChargingStation(reservation: Reservation, replyTo: ActorRef[ChargingStationEvents.ReservationResult]) extends Request with CborSerializable
   case class UpdateChargingStation(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Request with CborSerializable
   private case class ChargingStationsUpdated(chargingStations: Set[ActorRef[ChargingStationEvents.Request]]) extends Request
   private case class BadRequest() extends Request
@@ -65,13 +65,13 @@ object ChargingStationProvider:
       case (_, AskChargingStation(id, replyTo)) =>
         replyTo ! chargingStations.values.find(_.id == id)
         running(chargingStations)
-      case (ctx, AskToReserveChargingStation(id, replyTo)) =>
-        chargingStations.find(_._2.id == id) match {
+      case (ctx, AskToReserveChargingStation(r, replyTo)) =>
+        chargingStations.find(_._2.id == r.chargingStationId) match {
           case Some((ref, _)) =>
             given timeout: akka.util.Timeout = 5.seconds
             given executionContext: ExecutionContextExecutor = ctx.system.executionContext
             given scheduler: akka.actor.typed.Scheduler = ctx.system.scheduler
-            val reservation = ref.ask(Reserve(_))
+            val reservation = ref.ask(Reserve(r, _))
             reservation.onComplete {
               case scala.util.Success(value) =>
                 replyTo ! value.asInstanceOf[ChargingStationEvents.ReservationResult]

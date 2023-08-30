@@ -2,7 +2,7 @@ package it.unibo.scs.cluster.chargingstation
 
 import akka.actor.typed.ActorRef
 import it.unibo.scs.CborSerializable
-import it.unibo.scs.model.chargingstation.ChargingStation
+import it.unibo.scs.model.chargingstation.{ChargingStation, Reservation}
 import it.unibo.scs.model.chargingstation.ChargingStation.*
 import it.unibo.scs.model.chargingstation.ChargingStationState.ChargingStationState
 import it.unibo.scs.service.chargingstation.ChargingStationProvider
@@ -11,7 +11,7 @@ object ChargingStationEvents:
   sealed trait Request
   case class AskState(replyTo: ActorRef[Response]) extends Request with CborSerializable
   case class Charge(replyTo: ActorRef[Response]) extends Request
-  case class Reserve(replyTo: ActorRef[ReservationResult]) extends Request with CborSerializable
+  case class Reserve(reservation: Reservation, replyTo: ActorRef[ReservationResult]) extends Request with CborSerializable
   case class Tick() extends Request
   case class StopCharge() extends Request
   case class ProvidersUpdated(providers: Set[ActorRef[ChargingStationProvider.Request]]) extends Request

@@ -33,7 +33,7 @@ object ChargingStationActor:
       case (_, Charge(replyTo)) =>
           replyTo ! Ok()
           charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
-      case (_, Reserve(replyTo)) =>
+      case (_, Reserve(_, replyTo)) =>
           replyTo ! ReservationOk()
           reserved(chargingStation.copy(state = ChargingStationState.RESERVED), providers)
       case _ => free(chargingStation, providers)
@@ -49,7 +49,7 @@ object ChargingStationActor:
         case (_, Charge(replyTo)) =>
           replyTo ! NotOk(ChargingStationState.CHARGING)
           charging(chargingStation, providers)
-        case (_, Reserve(replyTo)) =>
+        case (_, Reserve(_, replyTo)) =>
           replyTo ! ReservationNotOk("This charging station is busy")
           charging(chargingStation, providers)
         case (_, StopCharge()) =>
@@ -68,7 +68,7 @@ object ChargingStationActor:
       case (_, Charge(replyTo)) =>
         // TODO implement
         charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
-      case (_, Reserve(replyTo)) =>
+      case (_, Reserve(_, replyTo)) =>
         replyTo ! ReservationNotOk("This charging station is already reserved")
         reserved(chargingStation, providers)
       case _ => reserved(chargingStation, providers)
