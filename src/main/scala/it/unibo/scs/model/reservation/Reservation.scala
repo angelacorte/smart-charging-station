@@ -1,7 +1,6 @@
 package it.unibo.scs.model.reservation
 
 import it.unibo.scs.CborSerializable
-import it.unibo.scs.model.reservation.Reservation
 import spray.json.DefaultJsonProtocol.*
 import spray.json.RootJsonFormat
 
