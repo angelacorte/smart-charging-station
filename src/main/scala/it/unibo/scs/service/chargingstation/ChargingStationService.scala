@@ -5,13 +5,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
-import akka.http.scaladsl.model.{StatusCode, StatusCodes}
-import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.server.Directives.*
-import akka.http.scaladsl.server.RouteResult.Complete
-import akka.stream.javadsl.GraphDSL
-import akka.stream.{CompletionStrategy, OverflowStrategy}
-import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.util.Timeout
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ChargeRequestNotOk, ChargeRequestOk, ReservationNotOk, ReservationOk}
@@ -21,9 +15,7 @@ import it.unibo.scs.model.chargingstation.ChargingStation.*
 import it.unibo.scs.model.reservation.Reservation
 import it.unibo.scs.service.chargingstation.ChargingStationProvider.{AskAllChargingStations, AskChargingStation, AskChargingStationToCharge, AskToReserveChargingStation}
 import it.unibo.scs.service.cors.CORSHandler
-import it.unibo.scs.service.ws.WSMessage
-import it.unibo.scs.service.ws.WSMessage.{SendChargingStations, WSMessage}
-import spray.json.enrichAny
+import it.unibo.scs.service.cors.CORSHandler.corsHandler
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
@@ -45,23 +37,19 @@ object ChargingStationService:
       import ChargingStation.Formats.given
       import Reservation.Formats.given // for the implicit marshaller
 
-      val corsHandler = new CORSHandler {}
-
       /** SETUP ROUTE */
       val route =
         concat(
-          options {
-            corsHandler.corsHandler(complete(StatusCodes.OK))
-          },
-          path("chargingstations") {
+
+          corsHandler(path("chargingstations") {
             get {
               val chargingStations = provider.ask(AskAllChargingStations)
               onSuccess(chargingStations) { stations =>
                 complete(stations.toList)
               }
             }
-          },
-          path("chargingstations" / IntNumber) { id =>
+          }),
+          corsHandler(path("chargingstations" / IntNumber) { id =>
             get {
               val chargingStation = provider.ask(AskChargingStation(id, _))
               onSuccess(chargingStation) { station =>
@@ -71,8 +59,8 @@ object ChargingStationService:
                   case None => complete("ChargingStation not found")
               }
             }
-          },
-          path( "reserve-station") {
+          }),
+          corsHandler(path( "reserve-station") {
             post {
               entity(as[Reservation]) { reservation =>
                 val response = provider.ask(AskToReserveChargingStation(reservation, _))
@@ -83,8 +71,8 @@ object ChargingStationService:
                 }
               }
             }
-          },
-          path("charge") {
+          }),
+          corsHandler(path("charge") {
             post {
               entity(as[ChargeRequest]) { chargeRequest =>
                 val response = provider.ask(AskChargingStationToCharge(chargeRequest, _))
@@ -95,7 +83,7 @@ object ChargingStationService:
                 }
               }
             }
-          },
+          }),
       )
 
 
