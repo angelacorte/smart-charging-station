@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.Directives.{_enhanceRouteWithConcatenation, com
 import akka.http.scaladsl.server.RouteConcatenation._enhanceRouteWithConcatenation
 
 
-trait CORSHandler:
+object CORSHandler:
 
   private val corsResponseHeaders = List(
     `Access-Control-Allow-Origin`.*,

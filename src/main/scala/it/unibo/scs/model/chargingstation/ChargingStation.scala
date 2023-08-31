@@ -1,7 +1,6 @@
 package it.unibo.scs.model.chargingstation
 
 import it.unibo.scs.CborSerializable
-import it.unibo.scs.model.chargingstation.{ChargingStation, ChargingStationState, Position}
 import it.unibo.scs.model.chargingstation.ChargingStationState.ChargingStationState
 import spray.json.DefaultJsonProtocol.*
 import spray.json.{DeserializationException, JsArray, JsString, JsValue, RootJsonFormat, enrichAny}
