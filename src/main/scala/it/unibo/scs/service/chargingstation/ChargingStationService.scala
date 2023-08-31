@@ -38,18 +38,17 @@ object ChargingStationService:
       import Reservation.Formats.given // for the implicit marshaller
 
       /** SETUP ROUTE */
-      val route =
+      val route = corsHandler(
         concat(
-
-          corsHandler(path("chargingstations") {
+          path("chargingstations") {
             get {
               val chargingStations = provider.ask(AskAllChargingStations)
               onSuccess(chargingStations) { stations =>
                 complete(stations.toList)
               }
             }
-          }),
-          corsHandler(path("chargingstations" / IntNumber) { id =>
+          },
+          path("chargingstations" / IntNumber) { id =>
             get {
               val chargingStation = provider.ask(AskChargingStation(id, _))
               onSuccess(chargingStation) { station =>
@@ -59,8 +58,8 @@ object ChargingStationService:
                   case None => complete("ChargingStation not found")
               }
             }
-          }),
-          corsHandler(path( "reserve-station") {
+          },
+          path( "reserve-station") {
             post {
               entity(as[Reservation]) { reservation =>
                 val response = provider.ask(AskToReserveChargingStation(reservation, _))
@@ -71,8 +70,8 @@ object ChargingStationService:
                 }
               }
             }
-          }),
-          corsHandler(path("charge") {
+          },
+          path("charge") {
             post {
               entity(as[ChargeRequest]) { chargeRequest =>
                 val response = provider.ask(AskChargingStationToCharge(chargeRequest, _))
@@ -83,7 +82,8 @@ object ChargingStationService:
                 }
               }
             }
-          }),
+          },
+        )
       )
 
 
