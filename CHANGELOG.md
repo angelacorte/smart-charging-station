@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/angelacorte/smart-charging-station/compare/1.0.2...1.0.3) (2023-08-31)
+
+
+### Documentation
+
+* add draft for introduction chapter ([1eadfca](https://github.com/angelacorte/smart-charging-station/commit/1eadfcad58857631e93b6fa6e346352ae1902bc2))
+
 ## [1.0.2](https://github.com/angelacorte/smart-charging-station/compare/1.0.1...1.0.2) (2023-08-29)
 
 
