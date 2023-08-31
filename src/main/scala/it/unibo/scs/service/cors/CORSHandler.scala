@@ -8,14 +8,13 @@ import akka.http.scaladsl.server.Directives.{_enhanceRouteWithConcatenation, com
 import akka.http.scaladsl.server.RouteConcatenation._enhanceRouteWithConcatenation
 
 
-object CORSHandler:
+trait CORSHandler:
 
   private val corsResponseHeaders = List(
     `Access-Control-Allow-Origin`.*,
     `Access-Control-Allow-Credentials`(true),
     `Access-Control-Allow-Headers`("Authorization",
       "Content-Type", "X-Requested-With"),
-    `Access-Control-Allow-Methods`(OPTIONS, POST, PUT, GET, DELETE)
   )
 
   //this directive adds access control headers to normal responses
