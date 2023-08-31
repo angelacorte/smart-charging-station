@@ -18,7 +18,7 @@ object CORSHandler:
   )
 
   //this directive adds access control headers to normal responses
-  private val addAccessControlHeaders: Directive0 = {
+  private def addAccessControlHeaders: Directive0 = {
     respondWithHeaders(corsResponseHeaders)
   }
 
