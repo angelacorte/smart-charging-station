@@ -5,7 +5,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
 
-case class ChargeRequest(userId: Int, chargingStationId: Int) extends CborSerializable
+case class ChargeRequest(userId: String, chargingStationId: Int) extends CborSerializable
 
 object ChargeRequest:
   object Formats:
