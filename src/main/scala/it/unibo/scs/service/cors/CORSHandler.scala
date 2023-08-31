@@ -14,11 +14,12 @@ object CORSHandler:
     `Access-Control-Allow-Origin`.*,
     `Access-Control-Allow-Credentials`(true),
     `Access-Control-Allow-Headers`("Authorization",
-      "Content-Type", "X-Requested-With")
+      "Content-Type", "X-Requested-With"),
+    `Access-Control-Allow-Methods`(OPTIONS, POST, PUT, GET, DELETE)
   )
 
   //this directive adds access control headers to normal responses
-  private def addAccessControlHeaders: Directive0 = {
+  private val addAccessControlHeaders: Directive0 = {
     respondWithHeaders(corsResponseHeaders)
   }
 
