@@ -11,8 +11,8 @@ class ChargingStationTest extends TestService:
   "A charging station" should {
 
     val chargingStation = ChargingStation(0, "Enel", "X Charging Station", 100, Position(44.17457186518429, 12.23658150624628))
-    val chargeRequest = ChargeRequest(0, 0)
-    val reservation = Reservation(0, 0)
+    val chargeRequest = ChargeRequest("6d", 0)
+    val reservation = Reservation("6d", 0)
 
     val sender = testKit.spawn(ChargingStationActor(chargingStation))
 
@@ -45,7 +45,7 @@ class ChargingStationTest extends TestService:
 
     "not accept reserve request if not free" in {
       val probe = testKit.createTestProbe[ChargingStationEvents.ReservationResult]()
-      sender ! ChargingStationEvents.Reserve(Reservation(1,0), probe.ref)
+      sender ! ChargingStationEvents.Reserve(Reservation("6d",0), probe.ref)
       probe.expectMessage(ChargingStationEvents.ReservationNotOk("This charging station is already reserved"))
     }
   }
