@@ -33,12 +33,16 @@ object ChargingStationActor:
       case (ctx, AskState(replyTo)) =>
         replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
         free(chargingStation, providers)
-      case (_, Charge(_, replyTo)) =>
-          replyTo ! ChargeRequestOk()
-          charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
-      case (_, Reserve(reservation, replyTo)) =>
-          replyTo ! ReservationOk()
-          reserved(chargingStation.copy(state = ChargingStationState.RESERVED), reservation, providers)
+      case (ctx, Charge(_, replyTo)) =>
+        val newStation = chargingStation.toCharging
+        providers.foreach(_ ! UpdateChargingStation(newStation, ctx.self))
+        replyTo ! ChargeRequestOk()
+        charging(newStation, providers)
+      case (ctx, Reserve(reservation, replyTo)) =>
+        val newStation = chargingStation.toReserved
+        providers.foreach(_ ! UpdateChargingStation(newStation, ctx.self))
+        replyTo ! ReservationOk()
+        reserved(newStation, reservation, providers)
       case _ => free(chargingStation, providers)
     }
 
@@ -57,8 +61,10 @@ object ChargingStationActor:
         case (_, Reserve(_, replyTo)) =>
           replyTo ! ReservationNotOk("This charging station is busy")
           charging(chargingStation, providers)
-        case (_, StopCharge()) =>
-          free(chargingStation.copy(state = ChargingStationState.FREE), providers)
+        case (ctx, StopCharge()) =>
+          val newStation = chargingStation.toFree
+          providers.foreach(_ ! UpdateChargingStation(newStation, ctx.self))
+          free(newStation, providers)
         case _ => charging(chargingStation, providers)
       }
     }
@@ -70,10 +76,12 @@ object ChargingStationActor:
       case (ctx, AskState(replyTo)) =>
         replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
         reserved(chargingStation, reservation, providers)
-      case (_, Charge(request, replyTo)) =>
+      case (ctx, Charge(request, replyTo)) =>
         if request.userId equals reservation.userId then
+          val newStation = chargingStation.toCharging
+          providers.foreach(_ ! UpdateChargingStation(newStation, ctx.self))
           replyTo ! ChargeRequestOk()
-          charging(chargingStation.copy(state = ChargingStationState.CHARGING), providers)
+          charging(newStation, providers)
         else
           replyTo ! ChargeRequestNotOk("This charging station is reserved")
           reserved(chargingStation, reservation, providers)
