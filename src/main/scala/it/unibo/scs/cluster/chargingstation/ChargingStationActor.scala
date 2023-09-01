@@ -3,7 +3,7 @@ package it.unibo.scs.cluster.chargingstation
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import it.unibo.scs.service.chargingstation.ChargingStationProvider.ProviderServiceKey
+import it.unibo.scs.service.chargingstation.ChargingStationProvider.{ProviderServiceKey, UpdateChargingStation}
 import it.unibo.scs.model.chargingstation.{ChargingStation, ChargingStationState}
 import it.unibo.scs.model.reservation.Reservation
 import it.unibo.scs.service.chargingstation.ChargingStationProvider
