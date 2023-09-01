@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/angelacorte/smart-charging-station/compare/1.0.3...1.0.4) (2023-09-01)
+
+
+### Documentation
+
+* refactored sec01 ([9335ae5](https://github.com/angelacorte/smart-charging-station/commit/9335ae553e80143c9384318057fa1d86aedc0388))
+
 ## [1.0.3](https://github.com/angelacorte/smart-charging-station/compare/1.0.2...1.0.3) (2023-08-31)
 
 
