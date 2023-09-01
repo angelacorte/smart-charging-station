@@ -9,8 +9,18 @@ import it.unibo.scs.CborSerializable
  */
 case class Reservation(userId: String, chargingStationId: Int) extends CborSerializable
 
+/**
+ * The result of a reservation request.
+ */
 sealed trait ReservationResult
 
+/**
+ * The reservation request was accepted.
+ */
 case class ReservationOk() extends ReservationResult with CborSerializable
 
+/**
+ * The reservation request was rejected.
+ * @param reason The reason why the reservation was rejected.
+ */
 case class ReservationNotOk(reason: String = "") extends ReservationResult with CborSerializable

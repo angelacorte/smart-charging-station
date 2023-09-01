@@ -17,8 +17,8 @@ object ChargingStationState extends Enumeration with Serializable:
 
 /**
  * A position in the world.
- * @param latitude
- * @param longitude
+ * @param latitude the latitude of the position
+ * @param longitude the longitude of the position
  */
 case class Position(latitude: Double, longitude: Double) extends CborSerializable
 
@@ -36,8 +36,7 @@ case class ChargingStation(id: Int, provider: String, name: String, voltage: Dou
 object ChargingStation:
   /**
    * Implicit class to add some useful methods to the ChargingStation class.
-   * @param station the charging station to extend
-   */
+   * */
   extension (station: ChargingStation)
 
     /**

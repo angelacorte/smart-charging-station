@@ -18,7 +18,7 @@ object ChargingStationActor:
   import ChargingStationEvents.*
 
   /**
-   * The key used to register the charging station actor in the receptionist.
+   * This is the [[ServiceKey]] used to register the [[ChargingStationActor]] in the [[Receptionist]].
    */
   val ChargingStationServiceKey: ServiceKey[ChargingStationEvents.Request] = ServiceKey[ChargingStationEvents.Request]("ChargingStation")
 
