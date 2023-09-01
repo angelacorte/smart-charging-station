@@ -9,6 +9,9 @@ import spray.json.DefaultJsonProtocol.*
 import spray.json.enrichAny
 import spray.json.{DeserializationException, JsArray, JsString, JsValue, RootJsonFormat}
 
+/**
+ * This object contains implicit marshallers and unmarshallers for requests sent to, and responses sent by the [[ChargingStationService]].
+ */
 object Formats:
   given stateFormatter: RootJsonFormat[ChargingStationState] with
     override def write(obj: ChargingStationState.Value): JsValue = JsString(obj.toString)

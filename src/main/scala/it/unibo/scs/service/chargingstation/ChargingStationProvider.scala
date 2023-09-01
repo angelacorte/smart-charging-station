@@ -17,18 +17,65 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
 
+/**
+ * This actor is responsible for managing the charging stations. I does so by observing [[ChargingStationActor]] and by exposing a [[ChargingStationService]]
+ */
 object ChargingStationProvider:
   private type ChargingStationRegistry = Map[ActorRef[ChargingStationEvents.Request], ChargingStation]
+
+  /**
+   * This trait represents the messages that can be sent to the [[ChargingStationProvider]].
+   */
   sealed trait Request
+
+  /**
+   * This message is sent to the [[ChargingStationProvider]] to ask for a set of all the charging stations.
+   * @param replyTo the actor that will receive the set of charging stations
+   */
   case class AskAllChargingStations(replyTo: ActorRef[Set[ChargingStation]]) extends Request with CborSerializable
+
+  /**
+   * This message is sent to the [[ChargingStationProvider]] to ask for a specific charging station.
+   * @param id the id of the charging station
+   * @param replyTo the actor that will receive the charging station
+   */
   case class AskChargingStation(id: Int, replyTo: ActorRef[Option[ChargingStation]]) extends Request with CborSerializable
+
+  /**
+   * This message is sent to the [[ChargingStationProvider]] to ask for a reservation of a charging station.
+   * @param reservation the reservation request
+   * @param replyTo the actor that will receive the reservation result
+   */
   case class AskToReserveChargingStation(reservation: Reservation, replyTo: ActorRef[ReservationResult]) extends Request with CborSerializable
+
+  /**
+   * This message is sent to the [[ChargingStationProvider]] to ask a charging station to begin the charging process.
+   * @param request the charge request
+   * @param replyTo the actor that will receive the charge request result
+   */
   case class AskChargingStationToCharge(request: ChargeRequest, replyTo: ActorRef[ChargeRequestResult]) extends Request
+
+  /**
+   * This message is sent to the [[ChargingStationProvider]] to update the charging station inside its [[ChargingStationRegistry]].
+   * @param chargingStation the charging station to update
+   * @param ref the actor that represents the charging station in the cluster
+   */
   case class UpdateChargingStation(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Request with CborSerializable
+
+  /**
+   * This message is sent to the [[ChargingStationProvider]] when the [[Receptionist]] has updated the charging stations set in the cluster.
+   * @param chargingStations the set of charging stations
+   */
   private case class ChargingStationsUpdated(chargingStations: Set[ActorRef[ChargingStationEvents.Request]]) extends Request
+  
+  /**
+   * This message represents an invalid request.
+   */
   private case class BadRequest() extends Request
 
-
+  /**
+   * This is the [[ServiceKey]] used to register the [[ChargingStationProvider]] in the [[Receptionist]].
+   */
   val ProviderServiceKey: ServiceKey[Request] = ServiceKey("ChargingStationProvider")
 
   def apply(chargingStations: ChargingStationRegistry = Map.empty): Behavior[Request] =
@@ -39,8 +86,6 @@ object ChargingStationProvider:
       }
       ctx.system.receptionist ! Receptionist.Subscribe(ChargingStationServiceKey, subscriptionAdapter)
       ctx.system.receptionist ! Receptionist.Register(ProviderServiceKey, ctx.self)
-
-
 
       /** SPAWN CS SERVICE */
       ctx.spawn(ChargingStationService(ctx.self), "ChargingStationService")
@@ -105,7 +150,6 @@ object ChargingStationProvider:
           case None =>
             replyTo ! ChargeRequestNotOk("Charging station not found")
         }
-
         running(chargingStations)
       case _ =>
         running(chargingStations)

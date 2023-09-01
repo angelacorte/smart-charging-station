@@ -19,11 +19,19 @@ import it.unibo.scs.service.cors.CORSHandler.corsHandler
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
 
-
-object ChargingStationService:
+/**
+ * This actor exposes a REST API to interact with the charging stations. It is spawned by the [[ChargingStationProvider]].
+ */
+private[chargingstation] object ChargingStationService:
+  /**
+   * This trait defines the messages that the [[ChargingStationService]] actor can receive.
+   */
   sealed trait Request
-  case class Stop() extends Request
 
+  /**
+   * This message is sent to the [[ChargingStationService]] actor to unbind the server and stop the actor.
+   */
+  case class Stop() extends Request
 
   def apply(provider: ActorRef[ChargingStationProvider.Request], port: Int = 8080): Behavior[Request] =
     Behaviors.setup { context =>
