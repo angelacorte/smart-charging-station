@@ -31,7 +31,7 @@ object ChargingStationActor:
       case (_, ProvidersUpdated(providers)) =>
         free(chargingStation, providers)
       case (ctx, AskState(replyTo)) =>
-        replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
+        replyTo ! UpdateChargingStation(chargingStation, ctx.self)
         free(chargingStation, providers)
       case (ctx, Charge(_, replyTo)) =>
         val newStation = chargingStation.toCharging
@@ -53,7 +53,7 @@ object ChargingStationActor:
         case (_, ProvidersUpdated(providers)) =>
           charging(chargingStation, providers)
         case (ctx, AskState(replyTo)) =>
-          replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
+          replyTo ! UpdateChargingStation(chargingStation, ctx.self)
           charging(chargingStation, providers)
         case (_, Charge(_, replyTo)) =>
           replyTo ! ChargeRequestNotOk("This charging station is busy")
@@ -74,7 +74,7 @@ object ChargingStationActor:
       case (_, ProvidersUpdated(providers)) =>
         reserved(chargingStation, reservation, providers)
       case (ctx, AskState(replyTo)) =>
-        replyTo ! ChargingStationUpdated(chargingStation, ctx.self)
+        replyTo ! UpdateChargingStation(chargingStation, ctx.self)
         reserved(chargingStation, reservation, providers)
       case (ctx, Charge(request, replyTo)) =>
         if request.userId equals reservation.userId then
