@@ -48,7 +48,7 @@ object ChargingStationActor:
 
   private def charging(chargingStation: ChargingStation, providers: Set[ActorRef[ChargingStationProvider.Request]]): Behavior[ChargingStationEvents.Request] =
     Behaviors withTimers { timers =>
-      timers.startTimerWithFixedDelay(StopCharge(), 3.seconds)
+      timers.startTimerWithFixedDelay(StopCharge(), 10.seconds)
       Behaviors receive {
         case (_, ProvidersUpdated(providers)) =>
           charging(chargingStation, providers)
