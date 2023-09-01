@@ -2,10 +2,11 @@ package it.unibo.scs.service.chargingstation
 
 import akka.actor.typed.scaladsl.AskPattern.*
 import akka.actor.typed.scaladsl.Behaviors
+import akka.http.scaladsl.model._
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
-import akka.http.scaladsl.server.Directives.*
+import akka.http.scaladsl.server.Directives._
 import akka.util.Timeout
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ChargeRequestNotOk, ChargeRequestOk, ReservationNotOk, ReservationOk}
@@ -55,7 +56,7 @@ object ChargingStationService:
                 // necessary cast because the compiler is an idiot (or because of type erasure)
                 station.asInstanceOf[Option[ChargingStation]] match
                   case Some(station) => complete(station)
-                  case None => complete("ChargingStation not found")
+                  case None => complete(HttpResponse(404, entity = s"ChargingStation with id $id not found"))
               }
             }
           },
@@ -66,7 +67,7 @@ object ChargingStationService:
                 onSuccess(response) { res =>
                   res.asInstanceOf[ChargingStationEvents.ReservationResult] match
                     case ReservationOk() => complete("Reservation successful")
-                    case ReservationNotOk(reason) => complete(s"Reservation not successful, reason: $reason")
+                    case ReservationNotOk(reason) => complete(HttpResponse(400, entity = s"Reservation not successful, reason: $reason"))
                 }
               }
             }
@@ -78,7 +79,7 @@ object ChargingStationService:
                 onSuccess(response) { res =>
                   res.asInstanceOf[ChargingStationEvents.ChargeRequestResult] match
                     case ChargeRequestOk() => complete("Charge successful")
-                    case ChargeRequestNotOk(reason) => complete(s"Charge not successful, reason: $reason")
+                    case ChargeRequestNotOk(reason) => complete(HttpResponse(400, entity = s"Charge not successful, reason: $reason"))
                 }
               }
             }
