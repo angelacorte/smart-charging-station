@@ -66,7 +66,6 @@ object ChargingStationProvider:
 
     Behaviors receive {
       case (ctx, ChargingStationsUpdated(refs)) =>
-        // TODO refactor with ask pattern
         val csAdapter = ctx.messageAdapter[ChargingStationEvents.Response] {
           case ChargingStationEvents.ChargingStationUpdated(chargingStation, ref) =>
             UpdateChargingStation(chargingStation, ref)
