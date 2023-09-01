@@ -13,6 +13,15 @@ case class Position(latitude: Double, longitude: Double) extends CborSerializabl
 case class ChargingStation(id: Int, provider: String, name: String, voltage: Double, position: Position = Position(0,0), state: ChargingStationState = ChargingStationState.FREE) extends CborSerializable
 
 object ChargingStation:
+  extension (station: ChargingStation)
+    def isFree: Boolean = station.state == ChargingStationState.FREE
+    def isCharging: Boolean = station.state == ChargingStationState.CHARGING
+    def isReserved: Boolean = station.state == ChargingStationState.RESERVED
+    def isUnavailable: Boolean = station.state == ChargingStationState.UNAVAILABLE
+    def toFree: ChargingStation = station.copy(state = ChargingStationState.FREE)
+    def toCharging: ChargingStation = station.copy(state = ChargingStationState.CHARGING)
+    def toReserved: ChargingStation = station.copy(state = ChargingStationState.RESERVED)
+    
   object Formats:
     given stateFormatter: RootJsonFormat[ChargingStationState] with
       override def write(obj: ChargingStationState.Value): JsValue = JsString(obj.toString)
