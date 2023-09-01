@@ -66,14 +66,8 @@ object ChargingStationProvider:
 
     Behaviors receive {
       case (ctx, ChargingStationsUpdated(refs)) =>
-        val csAdapter = ctx.messageAdapter[ChargingStationEvents.Response] {
-          case ChargingStationEvents.ChargingStationUpdated(chargingStation, ref) =>
-            UpdateChargingStation(chargingStation, ref)
-          case _ =>
-            BadRequest()
-        }
         refs foreach {
-          _ ! ChargingStationEvents.AskState(csAdapter)
+          _ ! ChargingStationEvents.AskState(ctx.self)
         }
         running(chargingStations)
       case (_, UpdateChargingStation(chargingStation, ref)) =>

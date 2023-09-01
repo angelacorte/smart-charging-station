@@ -10,7 +10,7 @@ import it.unibo.scs.service.chargingstation.ChargingStationProvider
 
 object ChargingStationEvents:
   sealed trait Request
-  case class AskState(replyTo: ActorRef[Response]) extends Request with CborSerializable
+  case class AskState(replyTo: ActorRef[ChargingStationProvider.Request]) extends Request with CborSerializable
   case class Charge(request: ChargeRequest, replyTo: ActorRef[ChargeRequestResult]) extends Request with CborSerializable
   case class Reserve(reservation: Reservation, replyTo: ActorRef[ReservationResult]) extends Request with CborSerializable
   case class StopCharge() extends Request
