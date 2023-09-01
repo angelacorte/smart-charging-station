@@ -2,17 +2,16 @@ package it.unibo.scs.service.chargingstation
 
 import akka.actor.typed.scaladsl.AskPattern.*
 import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.model._
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.*
+import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ChargeRequestNotOk, ChargeRequestOk, ReservationNotOk, ReservationOk}
 import it.unibo.scs.model.chargerequest.ChargeRequest
 import it.unibo.scs.model.chargingstation.ChargingStation
-import it.unibo.scs.model.chargingstation.ChargingStation.*
 import it.unibo.scs.model.reservation.Reservation
 import it.unibo.scs.service.chargingstation.ChargingStationProvider.{AskAllChargingStations, AskChargingStation, AskChargingStationToCharge, AskToReserveChargingStation}
 import it.unibo.scs.service.cors.CORSHandler
