@@ -1,8 +1,6 @@
 package it.unibo.scs.model.chargerequest
 
 import it.unibo.scs.CborSerializable
-import spray.json.DefaultJsonProtocol._
-import spray.json.RootJsonFormat
 
 /**
  * A charge request is a request to charge a vehicle.
