@@ -34,9 +34,7 @@ object ChargingStationService:
       given system: ActorSystem[Nothing] = context.system
       given executionContext: ExecutionContextExecutor = system.executionContext // for Future.flatmap
       given timeout: Timeout = 5.seconds // for the ask pattern
-      import ChargeRequest.Formats.given
-      import ChargingStation.Formats.given
-      import Reservation.Formats.given // for the implicit marshaller
+      import it.unibo.scs.service.Formats.given // for the implicit marshaller
 
       /** SETUP ROUTE */
       val route = corsHandler(
