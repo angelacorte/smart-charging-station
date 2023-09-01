@@ -7,11 +7,11 @@ import akka.actor.typed.{ActorRef, Behavior}
 import it.unibo.scs.CborSerializable
 import it.unibo.scs.cluster.chargingstation.ChargingStationActor.ChargingStationServiceKey
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
-import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{Charge, ReservationNotOk, Reserve}
-import it.unibo.scs.model.chargerequest.ChargeRequest
+import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{Charge, Reserve}
+import it.unibo.scs.model.chargerequest.{ChargeRequest, ChargeRequestNotOk, ChargeRequestResult, ChargeRequestOk}
 import it.unibo.scs.model.chargingstation.ChargingStation
 import it.unibo.scs.model.chargingstation.ChargingStation.*
-import it.unibo.scs.model.reservation.Reservation
+import it.unibo.scs.model.reservation.{Reservation, ReservationNotOk, ReservationResult, ReservationOk}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
@@ -22,8 +22,8 @@ object ChargingStationProvider:
   sealed trait Request
   case class AskAllChargingStations(replyTo: ActorRef[Set[ChargingStation]]) extends Request with CborSerializable
   case class AskChargingStation(id: Int, replyTo: ActorRef[Option[ChargingStation]]) extends Request with CborSerializable
-  case class AskToReserveChargingStation(reservation: Reservation, replyTo: ActorRef[ChargingStationEvents.ReservationResult]) extends Request with CborSerializable
-  case class AskChargingStationToCharge(request: ChargeRequest, replyTo: ActorRef[ChargingStationEvents.ChargeRequestResult]) extends Request
+  case class AskToReserveChargingStation(reservation: Reservation, replyTo: ActorRef[ReservationResult]) extends Request with CborSerializable
+  case class AskChargingStationToCharge(request: ChargeRequest, replyTo: ActorRef[ChargeRequestResult]) extends Request
   case class UpdateChargingStation(chargingStation: ChargingStation, ref: ActorRef[ChargingStationEvents.Request]) extends Request with CborSerializable
   private case class ChargingStationsUpdated(chargingStations: Set[ActorRef[ChargingStationEvents.Request]]) extends Request
   private case class BadRequest() extends Request
@@ -84,7 +84,7 @@ object ChargingStationProvider:
             val reservation = ref.ask(Reserve(r, _))
             reservation.onComplete {
               case Success(value) =>
-                replyTo ! value.asInstanceOf[ChargingStationEvents.ReservationResult]
+                replyTo ! value.asInstanceOf[ReservationResult]
               case Failure(exception) =>
                 replyTo ! ReservationNotOk(exception.getMessage)
             }
@@ -98,12 +98,12 @@ object ChargingStationProvider:
             val chargeRequest = ref.ask(Charge(r, _))
             chargeRequest.onComplete {
               case Success(value) =>
-                replyTo ! value.asInstanceOf[ChargingStationEvents.ChargeRequestResult]
+                replyTo ! value.asInstanceOf[ChargeRequestResult]
               case Failure(exception) =>
-                replyTo ! ChargingStationEvents.ChargeRequestNotOk(exception.getMessage)
+                replyTo ! ChargeRequestNotOk(exception.getMessage)
             }
           case None =>
-            replyTo ! ChargingStationEvents.ChargeRequestNotOk("Charging station not found")
+            replyTo ! ChargeRequestNotOk("Charging station not found")
         }
 
         running(chargingStations)

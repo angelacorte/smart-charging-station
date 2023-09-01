@@ -8,3 +8,9 @@ import it.unibo.scs.CborSerializable
  * @param chargingStationId the charging station id
  */
 case class ChargeRequest(userId: String, chargingStationId: Int) extends CborSerializable
+
+sealed trait ChargeRequestResult
+
+case class ChargeRequestOk() extends ChargeRequestResult with CborSerializable
+
+case class ChargeRequestNotOk(reason: String = "") extends ChargeRequestResult with CborSerializable
