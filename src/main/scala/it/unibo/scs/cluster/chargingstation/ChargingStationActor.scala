@@ -3,16 +3,23 @@ package it.unibo.scs.cluster.chargingstation
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
+import it.unibo.scs.model.chargerequest.{ChargeRequest, ChargeRequestOk, ChargeRequestNotOk}
 import it.unibo.scs.model.chargingstation.ChargingStation
-import it.unibo.scs.model.reservation.Reservation
+import it.unibo.scs.model.reservation.{Reservation, ReservationNotOk, ReservationOk}
 import it.unibo.scs.service.chargingstation.ChargingStationProvider
 import it.unibo.scs.service.chargingstation.ChargingStationProvider.{ProviderServiceKey, UpdateChargingStation}
 
 import scala.concurrent.duration.DurationInt
 
+/**
+ * An actor representing the behavior of a charging station inside the cluster.
+ */
 object ChargingStationActor:
   import ChargingStationEvents.*
 
+  /**
+   * The key used to register the charging station actor in the receptionist.
+   */
   val ChargingStationServiceKey: ServiceKey[ChargingStationEvents.Request] = ServiceKey[ChargingStationEvents.Request]("ChargingStation")
 
   def apply(chargingStation: ChargingStation, providers: Set[ActorRef[ChargingStationProvider.Request]] = Set.empty): Behavior[ChargingStationEvents.Request] =
@@ -21,7 +28,9 @@ object ChargingStationActor:
         case ChargingStationProvider.ProviderServiceKey.Listing(providers) =>
           ProvidersUpdated(providers)
       }
+      // subscribe to the charging station providers
       ctx.system.receptionist ! Receptionist.Subscribe(ProviderServiceKey, subscriptionAdapter)
+      // register the charging station actor
       ctx.system.receptionist ! Receptionist.Register(ChargingStationServiceKey, ctx.self)
       free(chargingStation, providers)
     }
@@ -48,6 +57,7 @@ object ChargingStationActor:
 
   private def charging(chargingStation: ChargingStation, providers: Set[ActorRef[ChargingStationProvider.Request]]): Behavior[ChargingStationEvents.Request] =
     Behaviors withTimers { timers =>
+      // simulate a charging session
       timers.startTimerWithFixedDelay(StopCharge(), 10.seconds)
       Behaviors receive {
         case (_, ProvidersUpdated(providers)) =>

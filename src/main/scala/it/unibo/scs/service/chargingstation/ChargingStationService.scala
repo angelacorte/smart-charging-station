@@ -9,10 +9,9 @@ import akka.http.scaladsl.model.*
 import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
 import it.unibo.scs.cluster.chargingstation.ChargingStationEvents
-import it.unibo.scs.cluster.chargingstation.ChargingStationEvents.{ChargeRequestNotOk, ChargeRequestOk, ReservationNotOk, ReservationOk}
-import it.unibo.scs.model.chargerequest.ChargeRequest
+import it.unibo.scs.model.chargerequest.{ChargeRequest, ChargeRequestResult, ChargeRequestNotOk, ChargeRequestOk}
 import it.unibo.scs.model.chargingstation.ChargingStation
-import it.unibo.scs.model.reservation.Reservation
+import it.unibo.scs.model.reservation.{Reservation, ReservationNotOk, ReservationOk, ReservationResult}
 import it.unibo.scs.service.chargingstation.ChargingStationProvider.{AskAllChargingStations, AskChargingStation, AskChargingStationToCharge, AskToReserveChargingStation}
 import it.unibo.scs.service.cors.CORSHandler
 import it.unibo.scs.service.cors.CORSHandler.corsHandler
@@ -62,7 +61,7 @@ object ChargingStationService:
               entity(as[Reservation]) { reservation =>
                 val response = provider.ask(AskToReserveChargingStation(reservation, _))
                 onSuccess(response) { res =>
-                  res.asInstanceOf[ChargingStationEvents.ReservationResult] match
+                  res.asInstanceOf[ReservationResult] match
                     case ReservationOk() => complete("Reservation successful")
                     case ReservationNotOk(reason) => complete(HttpResponse(400, entity = s"Reservation not successful, reason: $reason"))
                 }
@@ -74,7 +73,7 @@ object ChargingStationService:
               entity(as[ChargeRequest]) { chargeRequest =>
                 val response = provider.ask(AskChargingStationToCharge(chargeRequest, _))
                 onSuccess(response) { res =>
-                  res.asInstanceOf[ChargingStationEvents.ChargeRequestResult] match
+                  res.asInstanceOf[ChargeRequestResult] match
                     case ChargeRequestOk() => complete("Charge successful")
                     case ChargeRequestNotOk(reason) => complete(HttpResponse(400, entity = s"Charge not successful, reason: $reason"))
                 }

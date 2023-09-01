@@ -8,3 +8,9 @@ import it.unibo.scs.CborSerializable
  * @param chargingStationId The charging station that the user wants to reserve.
  */
 case class Reservation(userId: String, chargingStationId: Int) extends CborSerializable
+
+sealed trait ReservationResult
+
+case class ReservationOk() extends ReservationResult with CborSerializable
+
+case class ReservationNotOk(reason: String = "") extends ReservationResult with CborSerializable
