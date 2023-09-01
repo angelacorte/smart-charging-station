@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/angelacorte/smart-charging-station/compare/1.0.4...1.0.5) (2023-09-01)
+
+
+### Documentation
+
+* remove some requirements ([c9fec43](https://github.com/angelacorte/smart-charging-station/commit/c9fec43c36b802083134973c375f0f89822f6432))
+
 ## [1.0.4](https://github.com/angelacorte/smart-charging-station/compare/1.0.3...1.0.4) (2023-09-01)
 
 
